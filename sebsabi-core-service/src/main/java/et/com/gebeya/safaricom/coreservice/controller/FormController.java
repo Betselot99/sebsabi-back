@@ -39,23 +39,23 @@ public class FormController {
     public List<Form> getAllForms() {
         return formService.getAllForms();
     }
-    @GetMapping("/view")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Form> getAllFormsByStatus(@RequestParam Status status) {
-        return formService.getFormsByStatus(status);
-    }
+//    @GetMapping("/view")
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<Form> getAllFormsByStatus(@RequestParam Status status) {
+//        return formService.getFormsByStatus(status);
+//    }
 
-    @GetMapping("/view/form")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Form> getAllFormByClientEmailAndStatus(@RequestParam String clientEmail,@RequestParam Status status) {
-        return formService.getFormsByClientEmailAndStatus(clientEmail,status);
-    }
+//    @GetMapping("/view/form")
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<Form> getAllFormByClientIdAndStatus(@RequestParam Long useriId,@RequestParam Status status) {
+//        return formService.getFormsByClientIdAndStatus(useriId,status);
+//    }
 
-    @GetMapping("/{client_id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Optional<Form> getFormByClientId(@PathVariable Long client_id) {
-        return formService.getFormByClientId(client_id);
-    }
+//    @GetMapping("/{client_id}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Optional<Form> getFormByClientId(@PathVariable Long client_id) {
+//        return formService.getFormByClientId(client_id);
+//    }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)

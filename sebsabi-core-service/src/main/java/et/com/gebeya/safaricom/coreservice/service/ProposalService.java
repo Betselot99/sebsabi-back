@@ -5,20 +5,23 @@ import et.com.gebeya.safaricom.coreservice.dto.requestDto.ProposalDto;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.GigWorker;
 import et.com.gebeya.safaricom.coreservice.model.Proposal;
+import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.repository.ProposalRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class ProposalService {
     private final ProposalRepository proposalRepository;
     private final FormService formService; // Inject FormService
     private final GigWorkerService gigWorkerService; // Inject GigWorkerService
+    private final FormRepository formRepository; // Inject GigWorkerService
 
-    public ProposalService(ProposalRepository proposalRepository, FormService formService, GigWorkerService gigWorkerService) {
-        this.proposalRepository = proposalRepository;
-        this.formService = formService;
-        this.gigWorkerService = gigWorkerService;
-    }
+
+
 
     public void submitProposal(ProposalDto proposalDto) {
         Form form = formService.getFormById(proposalDto.getFormId());
@@ -32,26 +35,20 @@ public class ProposalService {
         proposalRepository.save(proposal);
     }
 
-    public ProposalDto getProposalByFormId(Long formId) {
-        Proposal proposal = proposalRepository.findByFormId(formId);
+    public List<Proposal> getProposalsByFormId(Long formId) {
+        return proposalRepository.findByFormId(formId);
+    }
 
-        // Ensure the proposal exists
-        if (proposal == null) {
-            // Handle the case where the proposal is not found, return null or throw an exception
-            return null;
-        }
+    public void acceptProposal(Long proposalId) {
+        Proposal proposal = proposalRepository.findById(proposalId)
+                .orElseThrow(() -> new RuntimeException("Proposal not found with id: " + proposalId));
 
-        // Retrieve the associated form and gig worker
+        // Update proposal status or perform other actions as needed
+
+        // Assign form to gig worker
         Form form = proposal.getForm();
         GigWorker gigWorker = proposal.getGigWorker();
-
-        // Map the entities to DTO
-        ProposalDto proposalDto = new ProposalDto();
-        proposalDto.setFormId(form.getId());
-        proposalDto.setGigWorkerId(gigWorker.getId());
-        proposalDto.setRatePerForm(proposal.getRatePerForm());
-        proposalDto.setProposalText(proposal.getProposalText());
-
-        return proposalDto;
+        form.setAssignedGigWorker(gigWorker);
+        formRepository.save(form);
     }
 }

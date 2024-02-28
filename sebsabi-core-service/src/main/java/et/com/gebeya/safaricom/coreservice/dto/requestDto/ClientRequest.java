@@ -27,4 +27,5 @@ public class ClientRequest {
     private String companyType;
     private String occupation;
     private Status isActive;
+    private byte[] profileImage;
 }

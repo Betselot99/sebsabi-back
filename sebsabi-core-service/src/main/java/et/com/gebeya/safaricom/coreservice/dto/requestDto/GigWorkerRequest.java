@@ -29,4 +29,5 @@ public class GigWorkerRequest {
     private String password;
     private int age;
     private Status isActive;
+    private byte[] profileImage;
 }
