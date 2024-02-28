@@ -10,7 +10,7 @@ build_microservices:
   #   DOCKER_REGISTRY: "gcr.io"  # Replace with your registry (e.g., Docker Hub, AWS ECR)
   #  DOCKER_IMAGE: $DOCKER_USER_NAME/${$APP_NAME}${CI_PROJECT_NAME}:$CI_COMMIT_SHA
   before_script:
-    - apt install git
+    # - apt install git
     - mvn clean install -DskipTests  # Install dependencies
   script:
     - echo $DOCKER_PASSWORD
