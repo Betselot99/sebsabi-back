@@ -1,30 +1,34 @@
 package et.com.gebeya.safaricom.coreservice.controller;
 
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientRequest;
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormDto;
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormQuestionDto;
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.ProposalDto;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
 import et.com.gebeya.safaricom.coreservice.model.Form;
+import et.com.gebeya.safaricom.coreservice.model.Proposal;
+import et.com.gebeya.safaricom.coreservice.model.Status;
 import et.com.gebeya.safaricom.coreservice.service.ClientService;
 import et.com.gebeya.safaricom.coreservice.service.FormService;
 import et.com.gebeya.safaricom.coreservice.service.ProposalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/api/core/client")
 public class ClientController {
     private final ClientService clientService;
@@ -62,16 +66,14 @@ public class ClientController {
     }
 
 
-    @GetMapping("/view/proposal/{formId}")
-    public ProposalDto getProposalByFormId(@PathVariable Long formId) {
-        return proposalService.getProposalByFormId(formId);
-    }
+
 
     @GetMapping("/view/form")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> getFormByClientId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal(); // Get user ID
+        log.info(userId.toString());
         Optional<Form> form = formService.getFormByClientId(Long.valueOf((Integer) userId));
 
         if (form.isPresent()) {
@@ -95,5 +97,44 @@ public class ClientController {
         return formService.addQuestionsToForm(formID, questionDTOList);
     }
 
+//    @GetMapping("/view/form/all-forms/{client_id}")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Optional<Form> getFormByClientId(@PathVariable Long client_id) {
+//        return formService.getFormByClientId(client_id);
+//    }
+//    @GetMapping("/view/form/status")
+//    @ResponseStatus(HttpStatus.OK)
+//    public List<Form> getAllFormByClientIdAndStatus(@RequestParam Status status) {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        Object userId = auth.getPrincipal(); // Get user ID
+//        return formService.getFormsByClientIdAndStatus(Long.valueOf((Integer)userId),status);
+//    }
+//@GetMapping("/view/forms/by_params")
+//public ResponseEntity<List<Form>> getForms(@RequestParam(required = false) Map<String, String> search,
+//                                           @PageableDefault(page = 0, size = 10) Pageable pageable) {
+//    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//    Object userId = auth.getPrincipal();
+//    FormSearchRequestDto formSearch = new FormSearchRequestDto(search);
+//    formSearch.setClientId(Long.valueOf((Integer) userId));
+//    return formService.getForms(formSearch, pageable); // Return the ResponseEntity directly
+//}
+//
+    @GetMapping("/view/form/proposal/{formId}")
+    public ResponseEntity<List<Proposal>> getProposalsByFormId(@PathVariable Long formId) {
+        List<Proposal> proposals = proposalService.getProposalsByFormId(formId);
+        return ResponseEntity.ok(proposals);
+    }
 
+    @PostMapping("/view/form/proposal/accept/{proposalId}")
+    public ResponseEntity<String> acceptProposal(@PathVariable Long proposalId) {
+        proposalService.acceptProposal(proposalId);
+        return ResponseEntity.ok("Proposal accepted successfully");
+    }
+
+    @GetMapping("/view/form/status") // Modified mapping to make it unique
+    public List<Form> getAllFormByClientIdAndStatus(@RequestParam Status status) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal(); // Get user ID
+        return formService.getFormsByClientIdAndStatus(Long.valueOf((Integer) userId), status);
+    }
 }

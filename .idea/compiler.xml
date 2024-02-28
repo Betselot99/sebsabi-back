@@ -7,10 +7,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="service_discovery" />
         <module name="api-gateway" />
-        <module name="sebsabi_core_service" />
+        <module name="service_discovery" />
         <module name="identity-service" />
+        <module name="sebsabi_core_service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>

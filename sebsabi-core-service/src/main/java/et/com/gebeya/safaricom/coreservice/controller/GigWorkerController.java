@@ -1,7 +1,9 @@
 package et.com.gebeya.safaricom.coreservice.controller;
 
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ProposalDto;
+import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.service.GigWorkerService;
 import et.com.gebeya.safaricom.coreservice.service.ProposalService;
@@ -12,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -38,6 +41,13 @@ public class GigWorkerController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal(); // Get user ID
         return gigWorkerService.getGigWorkerById(Long.valueOf((Integer)userId));
+    }
+    @PutMapping("/view/profile/update")
+    @ResponseStatus(HttpStatus.OK)
+    public GigwWorkerResponse updateGigworker(@RequestBody GigWorkerRequest gigWorkerRequest) throws InvocationTargetException, IllegalAccessException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal(); // Get user ID
+        return gigWorkerService.updateGigworker(Long.valueOf((Integer)userId), gigWorkerRequest);
     }
     @PostMapping("/submit")
     public ResponseEntity<String> submitProposal(@RequestBody ProposalDto proposalDto) {

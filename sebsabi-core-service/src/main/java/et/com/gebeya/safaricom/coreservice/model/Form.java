@@ -1,5 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormDto;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -29,8 +30,9 @@ public class Form {
     private Status status;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "client_username")
+    @JoinColumn(name = "client_id")
     @Valid
+    @JsonIgnore
     private Client client;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "form_id")

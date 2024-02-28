@@ -3,21 +3,28 @@ package et.com.gebeya.safaricom.coreservice.service;
 
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormQuestionDto;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
 import et.com.gebeya.safaricom.coreservice.model.*;
 import et.com.gebeya.safaricom.coreservice.model.enums.QuestionType;
 import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.UserResponseDto;
+import et.com.gebeya.safaricom.coreservice.repository.specification.FormSpecifications;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.AccessDeniedException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -81,8 +88,7 @@ public class FormService {
     }
 
     public Optional<Form> getFormByClientId(Long clientId) {
-        Optional<Form> form = formRepository.findFormByClient_Id(clientId);
-        return form;
+        return formRepository.findFormByClient_Id(clientId);
     }
 
 
@@ -90,9 +96,39 @@ public class FormService {
         return formRepository.findFormsByStatus(status);
     }
 
-    public List<Form> getFormsByClientEmailAndStatus(String email, Status status) {
-        return formRepository.findFormsByClient_EmailAndStatus(email, status);
+    public List<Form> getFormsByClientIdAndStatus(Long client_id, Status status) {
+        return formRepository.findFormsByClient_IdAndStatus(client_id, status);
     }
+
+
+    public ResponseEntity<List<Form>> getForms(FormSearchRequestDto formSearch, Pageable pageable) {
+        Long clientId = formSearch.getClientId();
+        Status status = formSearch.getStatus();
+
+        Page<Form> formPage;
+
+        if (clientId != null && status != null) {
+            // Both client ID and status are provided
+            formPage = formRepository.findAll(FormSpecifications.formByClientIdAndStatus(clientId, status), pageable);
+        } else if (clientId != null) {
+            // Only client ID is provided
+            formPage = formRepository.findAll(FormSpecifications.formByClientId(clientId), pageable);
+        } else if (status != null) {
+            // Only status is provided
+            formPage = formRepository.findAll(FormSpecifications.formByStatus(status), pageable);
+        } else {
+            // Neither client ID nor status is provided
+            formPage = formRepository.findAll(pageable);
+        }
+
+        List<Form> forms = formPage.getContent();
+        if (forms.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(forms);
+        } else {
+            return ResponseEntity.ok(forms);
+        }
+    }
+
 
     public Form updateForm(Long id, FormDto formDTO) throws InvocationTargetException, IllegalAccessException {
         Form existingForm = getFormById(id);

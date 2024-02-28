@@ -49,7 +49,11 @@ public class SecurityConfig {
                     "/api/core/client/view/profile/update",
                     "/api/core/client/view/form",
                     "/api/core/client/create/form",
-                    "/api/core/client/create/form/add/question-to-form"
+                    "/api/core/client/create/form/add/question-to-form",
+//                    "/api/core/client/view/forms/by_params",
+                    "/api/core/client/view/form/status",
+                    "/api/core/client/view/form/proposal/**",
+                    "/api/core/client/view/form/proposal/accept/{proposalId}"
             };
     public static final String[] GIGWORKER_MATCHERS =
             {
