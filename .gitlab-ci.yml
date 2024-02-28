@@ -1,0 +1,44 @@
+stages:
+  - build
+  - update-manifest
+
+build_microservices:
+  image: betselot456/maven3.8.4-jdk17
+  stage: build
+  # variables:
+  #   APP_NAME: "Sebsabi-"
+  #   DOCKER_REGISTRY: "gcr.io"  # Replace with your registry (e.g., Docker Hub, AWS ECR)
+  #  DOCKER_IMAGE: $DOCKER_USER_NAME/${$APP_NAME}${CI_PROJECT_NAME}:$CI_COMMIT_SHA
+  before_script:
+    - apt install git
+    - mvn clean install -DskipTests  # Install dependencies
+  script:
+    - echo $DOCKER_PASSWORD
+    - mvn clean compile jib:build #-Dimage=$DOCKER_REGISTRY/PROJECT/${APP_NAME}${CI_PROJECT_NAME}:$CI_COMMIT_SHA
+
+update-manifest:
+    stage: update-manifest
+    variables:
+        APP_NAME: "microservice-app-"
+        DOCKER_IMAGE: $DOCKER_USER_NAME/${$APP_NAME}${CI_PROJECT_NAME}:$CI_COMMIT_SHA
+        MANIFEST_GIT_REPO: https://$USERNAME:$PAT_TOKEN@git.gebeya.training/activity21/manifests.git
+    before_script:
+        - apk add git
+        - git clone $MANIFEST_GIT_REPO
+        - git config --global user.name "$GITLAB_USER_NAME"
+        - git config --global user.email "$GITLAB_USER_EMAIL"
+    script:
+        - cd manifests/backend
+        - git remote set-url origin --push $MANIFEST_GIT_REPO
+        # Loop through microservices and update deployment files
+        # Create a dynamic variable name & Retrieve the value of the dynamic variable
+        - |
+          for microservice in api-gateway core-service identity-service service-discovery notification-service; do
+            DOCKER_IMAGE_VAR="DOCKER_IMAGE_${microservice^^}"                   
+            DOCKER_IMAGE="${!DOCKER_IMAGE_VAR}"                 
+            sed -i "s#image:.*#${microservice}_deployment_image: ${DOCKER_IMAGE}#g" ./${microservice}/${microservice}_deployment.yaml
+            git stage ./${microservice}/${microservice}_deployment.yaml
+        - git commit -m "Update microservices deployment images [skip-ci]"
+        - git push origin HEAD:main
+
+          done
