@@ -1,4 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.model;
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -23,6 +25,7 @@ public class Proposal {
     @ManyToOne
     @JoinColumn(name = "form_id")
     @Valid
+    @JsonIgnore
     private Form form;
 
     @ManyToOne

@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GigwWorkerResponse {
-    private Long id;
+    //private Long id;
     private String firstName;
     private String lastName;
     private String email;
@@ -24,7 +24,7 @@ public class GigwWorkerResponse {
     private Status isActive;
 
     public GigwWorkerResponse(GigWorker gigWorker){
-        this.id=gigWorker.getId();
+      //  this.id=gigWorker.getId();
         this.firstName = gigWorker.getFirstName();
         this.lastName= gigWorker.getLastName();
         this.qualification= gigWorker.getQualification();
