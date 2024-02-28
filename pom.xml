@@ -81,7 +81,7 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>pl.project13.maven</groupId>
 				<artifactId>git-commit-id-plugin</artifactId>
@@ -104,7 +104,13 @@
 					<from>
 						<image>eclipse-temurin:17.0.4.1_1-jre</image>
 					</from>
-					<to><image>registry.hub.docker.com/betselot456/${project.artifactId}:${project.version}-${git.commit.id.abbrev}</image></to>	
+					<to>
+						<image>registry.hub.docker.com/betselot456/${project.artifactId}:${project.version}-${git.commit.id.abbrev}</image>
+						<auth>
+                			<username>${docker-hub.username}</username>
+                			<password>${docker-hub.password}</password>
+            			</auth>
+					</to>	
 				</configuration>
 			</plugin>
 		</plugins>
