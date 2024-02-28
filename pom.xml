@@ -89,7 +89,7 @@
 					<from>
 						<image>eclipse-temurin:17.0.4.1_1-jre</image>
 					</from>
-					<to><image>registry.hub.docker.com/betselot456/${project.artifactId}:${project.version}-${git.commit.id.abbrev}</image></to>	
+					<to><image>registry.hub.docker.com/betselot456/${project.artifactId}:${project.version}</image></to>	
 				</configuration>
 			</plugin>
 		</plugins>
