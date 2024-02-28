@@ -39,12 +39,12 @@ public class GigWorkerService {
     @Transactional
     public String createGigWorkers(GigWorkerRequest gigWorkerRequest){
         GigWorker gigWorker=new GigWorker(gigWorkerRequest);
-        createGigWorkersUserInformation(gigWorker);
         gigWorkerRepository.save(gigWorker);
+        createGigWorkersUserInformation(gigWorker);
         log.info("Gig-Worker {} is Created and saved",gigWorkerRequest.getFirstName());
         String fullName = gigWorker.getFirstName() + " " + gigWorker.getLastName();
 
-        //kafkaTemplate.send("notificationTopic",new ClientCreatedEvent(gigWorker.getEmail(),fullName));
+        kafkaTemplate.send("notificationTopic",new ClientCreatedEvent(gigWorker.getEmail(),fullName));
         return "Gig worker Signed up Successfully ";
     }
     private void createGigWorkersUserInformation(GigWorker gigWorker) {
@@ -56,6 +56,7 @@ public class GigWorkerService {
                 .authority(Authority.GIGWORKER)
                 .isActive(true)
                 .build();
+
 
         String response = webClientBuilder.build().post()
                 .uri("http://identity-service/api/auth/register")

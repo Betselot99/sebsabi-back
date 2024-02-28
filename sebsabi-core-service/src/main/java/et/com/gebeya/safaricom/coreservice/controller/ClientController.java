@@ -92,6 +92,7 @@ public class ClientController {
         return formService.createForm(formDTO, Long.valueOf((Integer)userId));
     }
 
+
     @PostMapping("/create/form/add/question-to-form")
     public Form addQuestionsToForm(@RequestParam Long formID, @RequestBody List<FormQuestionDto> questionDTOList) {
         return formService.addQuestionsToForm(formID, questionDTOList);
@@ -119,6 +120,11 @@ public class ClientController {
 //    return formService.getForms(formSearch, pageable); // Return the ResponseEntity directly
 //}
 //
+    @PutMapping("/view/form/update")
+    @ResponseStatus(HttpStatus.OK)
+    public Form updateForm(@RequestParam Long form_id, @RequestBody FormDto formDTO) throws InvocationTargetException, IllegalAccessException {
+        return formService.updateForm(form_id, formDTO);
+    }
     @GetMapping("/view/form/proposal/{formId}")
     public ResponseEntity<List<Proposal>> getProposalsByFormId(@PathVariable Long formId) {
         List<Proposal> proposals = proposalService.getProposalsByFormId(formId);

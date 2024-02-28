@@ -5,6 +5,10 @@ import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ProposalDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
+import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
+import et.com.gebeya.safaricom.coreservice.model.Form;
+import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.service.FormService;
 import et.com.gebeya.safaricom.coreservice.service.GigWorkerService;
 import et.com.gebeya.safaricom.coreservice.service.ProposalService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -23,6 +28,7 @@ import java.util.concurrent.CompletableFuture;
 public class GigWorkerController {
     private final GigWorkerService gigWorkerService;
     private final ProposalService proposalService;
+    private final FormService formService;
    @PostMapping("/signup")
 //   @CircuitBreaker(name = "identity",fallbackMethod = "fallBackMethod")
 //   @TimeLimiter(name = "identity")
@@ -49,9 +55,19 @@ public class GigWorkerController {
         Object userId = auth.getPrincipal(); // Get user ID
         return gigWorkerService.updateGigworker(Long.valueOf((Integer)userId), gigWorkerRequest);
     }
-    @PostMapping("/submit")
-    public ResponseEntity<String> submitProposal(@RequestBody ProposalDto proposalDto) {
+    @GetMapping("/view/forms")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Form> getAllFormByStatus() {
+        Status status = Status.Posted; // Set the status to "Posted"
+        return formService.getFormsByStatus(status);
+    }
 
+    @PostMapping("/view/forms/proposal/submit")
+    public ResponseEntity<String> submitProposal(@RequestParam Long form_id ,@RequestBody ProposalDto proposalDto) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        proposalDto.setFormId(form_id);
+        proposalDto.setGigWorkerId(Long.valueOf((Integer)userId));
         proposalService.submitProposal(proposalDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Proposal submitted successfully");
     }

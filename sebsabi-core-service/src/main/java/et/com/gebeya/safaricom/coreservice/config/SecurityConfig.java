@@ -53,11 +53,16 @@ public class SecurityConfig {
 //                    "/api/core/client/view/forms/by_params",
                     "/api/core/client/view/form/status",
                     "/api/core/client/view/form/proposal/**",
-                    "/api/core/client/view/form/proposal/accept/{proposalId}"
+                    "/api/core/client/view/form/proposal/accept/**",
+                    "/api/core/client/view/form/update"
             };
     public static final String[] GIGWORKER_MATCHERS =
             {
-                    "/api/core/gig-worker/**"
+                    "/api/core/gig-worker/view/profile",
+                    "/api/core/gig-worker/view/profile/update",
+                    "/api/core/gig-worker/view/forms",
+                    "/api/core/gig-worker/view/forms/proposal/submit"
+
             };
 
 
@@ -68,7 +73,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers(UNAUTHORIZED_MATCHERS).permitAll())
                 .authorizeHttpRequests(request -> request.requestMatchers(ADMIN_MATCHERS).hasAuthority(ADMIN))
-                .authorizeHttpRequests(request -> request.requestMatchers(CLIENT_MATCHERS).hasAuthority("ROLE_[CLIENT]"))
+                .authorizeHttpRequests(request -> request.requestMatchers(CLIENT_MATCHERS).hasAuthority(CLIENT))
                 .authorizeHttpRequests(request -> request.requestMatchers(GIGWORKER_MATCHERS).hasAuthority(GIGWORKER))
 
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS)).exceptionHandling(handling -> {
