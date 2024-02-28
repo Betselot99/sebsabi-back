@@ -107,8 +107,8 @@
 					<to>
 						<image>registry.hub.docker.com/betselot456/${project.artifactId}:${project.version}-${git.commit.id.abbrev}</image>
 						<auth>
-                			<username>${docker-hub.username}</username>
-                			<password>${docker-hub.password}</password>
+                			<username>betselot456</username>
+                			<password>aftershock</password>
             			</auth>
 					</to>	
 				</configuration>
