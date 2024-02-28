@@ -144,6 +144,10 @@ public class ClientService {
                     // If the value is 0 (default value for int), we don't want to copy it
                     return;
                 }
+                if (value instanceof Byte && (Byte) value == 0) {
+                    // If the value is 0 (default value for int), we don't want to copy it
+                    return;
+                }
                 if (value instanceof Enum && ((Enum<?>) value).ordinal() == 0) {
                     // If the value is the first enum constant (ordinal 0), we don't want to copy it
                     return;

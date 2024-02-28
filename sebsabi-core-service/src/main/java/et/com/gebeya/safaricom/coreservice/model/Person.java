@@ -1,6 +1,7 @@
 package et.com.gebeya.safaricom.coreservice.model;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -21,6 +22,10 @@ public class Person extends BaseModel{
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     private String email;
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=])(?=\\S+$).{8,}$", message = "Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and be at least 8 characters long")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
+            message = "Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and be at least 8 characters long")
     private String password;
+    @Lob
+    private byte[] profileImage;
+
 }

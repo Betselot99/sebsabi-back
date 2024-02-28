@@ -2,6 +2,10 @@ package et.com.gebeya.safaricom.coreservice.repository;
 
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.Status;
+import jakarta.ws.rs.core.EntityPart;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,7 +22,9 @@ public interface FormRepository extends JpaRepository<Form, Long> {
 
     List<Form> findFormsByStatus(Status status);
 
-    List<Form> findFormsByClient_EmailAndStatus(String email, Status status);
+    List<Form> findFormsByClient_IdAndStatus(Long client_id, Status status);
 
+
+    Page<Form> findAll(Specification<Form> specification, Pageable pageable);
 
 }
