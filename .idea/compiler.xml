@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="service_discovery" />
+        <module name="api-gateway" />
+        <module name="sebsabi_core_service" />
+        <module name="identity-service" />
+        <module name="notification-service" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="api_getway" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Sebsabi" options="" />
+      <module name="api-gateway" options="-parameters" />
+      <module name="api_getway" options="-parameters" />
+      <module name="identity-service" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
+      <module name="sebsabi_core_service" options="-parameters" />
+      <module name="service_discovery" options="-parameters" />
+    </option>
+  </component>
+</project>
