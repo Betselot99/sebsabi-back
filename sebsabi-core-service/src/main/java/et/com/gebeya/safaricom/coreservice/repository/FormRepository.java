@@ -28,4 +28,7 @@ public interface FormRepository extends JpaRepository<Form, Long> {
 
     Page<Form> findAll(Specification<Form> specification, Pageable pageable);
 
+    long countAllById();
+
+    long countFormsByStatus(Status status);
 }

@@ -152,30 +152,30 @@ public class FormService {
             return formRepository.findFormByIdAndAssignedGigWorkerId(formId, gig_worker_id).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
         }
 
-        public UserResponse submitResponse(UserResponseDto responseDTO) {
-            Form form = getFormById(responseDTO.getFormId());
-            FormQuestion question = form.getQuestions().stream()
-                    .filter(q -> q.getId().equals(responseDTO.getQuestionId()))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Question not found in the form"));
-
-            GigWorker gigWorker = gigWorkerService.getGigWorkerByIdg(responseDTO.getGigWorkerId());
-
-            UserResponse userResponse = new UserResponse();
-            userResponse.setForm(form);
-            userResponse.setQuestion(question);
-            userResponse.setGigWorker(gigWorker);
-
-            // Create Answer entity and set answerText
-            Answer answer = new Answer();
-            answer.setQuestion(question);
-            answer.setAnswerText(responseDTO.getUserAnswer());
-
-            // Set the answer in the UserResponse entity
-            userResponse.setAnswers(Collections.singletonList(answer));
-
-            return userResponseService.saveResponse(userResponse);
-        }
+//        public UserResponse submitResponse(UserResponseRequestDto responseDTO) {
+//            Form form = getFormById(responseDTO.getFormId());
+//            FormQuestion question = form.getQuestions().stream()
+//                    .filter(q -> q.getId().equals(responseDTO.getQuestionId()))
+//                    .findFirst()
+//                    .orElseThrow(() -> new RuntimeException("Question not found in the form"));
+//
+//            GigWorker gigWorker = gigWorkerService.getGigWorkerByIdg(responseDTO.getGigWorkerId());
+//
+//            UserResponse userResponse = new UserResponse();
+//            userResponse.setForm(form);
+//            userResponse.setQuestion(question);
+//            userResponse.setGigWorker(gigWorker);
+//
+//            // Create Answer entity and set answerText
+//            Answer answer = new Answer();
+//            answer.setQuestion(question);
+//            answer.setAnswerText(responseDTO.getUserAnswer());
+//
+//            // Set the answer in the UserResponse entity
+//            userResponse.setAnswers(Collections.singletonList(answer));
+//
+//            return userResponseService.saveResponse(userResponse);
+//        }
 
 public long getNumberOfJobs(){
         return formRepository.countAllById();
