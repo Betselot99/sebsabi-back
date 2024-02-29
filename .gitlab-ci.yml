@@ -1,6 +1,6 @@
 stages:
   - build
-  - update-manifest
+  - deploy
 
 build_microservices:
   image: betselot456/maven3.8.4-jdk17
