@@ -162,7 +162,9 @@ public class ClientService {
             }
         }
     }
+
     public long getNumberOfClients(){
         return clientRepository.countClientsByIsActive(Status.Active);
     }
+
 }
