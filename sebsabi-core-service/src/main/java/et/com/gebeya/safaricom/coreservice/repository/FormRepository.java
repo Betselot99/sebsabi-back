@@ -25,7 +25,7 @@ public interface FormRepository extends JpaRepository<Form, Long> {
     List<Form> findFormsByClient_IdAndStatus(Long client_id, Status status);
 
 
-    Page<Form> findAll(Specification<Form> specification, Pageable pageable);
+    //Page<Form> findAll(Specification<Form> specification, Pageable pageable);
     long countFormsByStatus(Status status);
 
     long countAllById();

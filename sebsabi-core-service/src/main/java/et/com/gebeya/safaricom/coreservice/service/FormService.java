@@ -101,33 +101,33 @@ public class FormService {
     }
 
 
-    public ResponseEntity<List<Form>> getForms(FormSearchRequestDto formSearch, Pageable pageable) {
-        Long clientId = formSearch.getClientId();
-        Status status = formSearch.getStatus();
-
-        Page<Form> formPage;
-
-        if (clientId != null && status != null) {
-            // Both client ID and status are provided
-            formPage = formRepository.findAll(FormSpecifications.formByClientIdAndStatus(clientId, status), pageable);
-        } else if (clientId != null) {
-            // Only client ID is provided
-            formPage = formRepository.findAll(FormSpecifications.formByClientId(clientId), pageable);
-        } else if (status != null) {
-            // Only status is provided
-            formPage = formRepository.findAll(FormSpecifications.formByStatus(status), pageable);
-        } else {
-            // Neither client ID nor status is provided
-            formPage = formRepository.findAll(pageable);
-        }
-
-        List<Form> forms = formPage.getContent();
-        if (forms.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(forms);
-        } else {
-            return ResponseEntity.ok(forms);
-        }
-    }
+//    public ResponseEntity<List<Form>> getForms(FormSearchRequestDto formSearch, Pageable pageable) {
+//        Long clientId = formSearch.getClientId();
+//        Status status = formSearch.getStatus();
+//
+//        Page<Form> formPage;
+//
+//        if (clientId != null && status != null) {
+//            // Both client ID and status are provided
+//            formPage = formRepository.findAll(FormSpecifications.formByClientIdAndStatus(clientId, status), pageable);
+//        } else if (clientId != null) {
+//            // Only client ID is provided
+//            formPage = formRepository.findAll(FormSpecifications.formByClientId(clientId), pageable);
+//        } else if (status != null) {
+//            // Only status is provided
+//            formPage = formRepository.findAll(FormSpecifications.formByStatus(status), pageable);
+//        } else {
+//            // Neither client ID nor status is provided
+//            formPage = formRepository.findAll(pageable);
+//        }
+//
+//        List<Form> forms = formPage.getContent();
+//        if (forms.isEmpty()) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(forms);
+//        } else {
+//            return ResponseEntity.ok(forms);
+//        }
+//    }
 
 
     public Form updateForm(Long id, FormDto formDTO) throws InvocationTargetException, IllegalAccessException {
@@ -179,6 +179,7 @@ public class FormService {
 
             return userResponseService.saveResponse(userResponse);
         }
+
 public long getNumberOfJobs(){
         return formRepository.countAllById();
 }

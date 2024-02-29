@@ -2,6 +2,7 @@ package et.com.gebeya.safaricom.coreservice.controller;
 
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
+import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.service.ClientService;
 import et.com.gebeya.safaricom.coreservice.service.FormService;
 import et.com.gebeya.safaricom.coreservice.service.GigWorkerService;
@@ -31,6 +32,10 @@ public class AdministratorController {
     @GetMapping("/view/gigworkers")
     public List<GigwWorkerResponse> getAllGigWorkers(){
         return gigWorkerService.getAllGigWorker();
+    }
+    @GetMapping("/view/AllForms")
+    public List<Form> getAllForms(){
+        return formService.getAllForms();
     }
     @GetMapping("/view/number_of_gigworkers")
     public long getNumberofGigWorkers(){
