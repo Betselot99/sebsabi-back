@@ -179,4 +179,10 @@ public class FormService {
 
             return userResponseService.saveResponse(userResponse);
         }
+public long getNumberOfJobs(){
+        return formRepository.countAllById();
+}
+public long getActiveNumberOfJobs(){
+ return formRepository.countFormsByStatus(Status.Active);
+}
     }

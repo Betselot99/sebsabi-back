@@ -1,11 +1,9 @@
 package et.com.gebeya.safaricom.coreservice.controller;
 
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientRequest;
+
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ProposalDto;
-import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
-import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.Status;
 import et.com.gebeya.safaricom.coreservice.service.FormService;
