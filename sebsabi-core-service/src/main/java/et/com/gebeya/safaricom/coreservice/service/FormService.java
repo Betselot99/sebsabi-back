@@ -148,9 +148,9 @@ public class FormService {
         }
     }
 
-        public Form getFormForGigWorker(Long formId, Long gig_worker_id) throws AccessDeniedException {
-            return formRepository.findFormByIdAndAssignedGigWorkerId(formId, gig_worker_id).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
-        }
+    public Form getFormForGigWorker(Long formId, Long gig_worker_id) throws AccessDeniedException {
+        return formRepository.findFormByIdAndAssignedGigWorkerId(formId, gig_worker_id).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
+    }
 
 //        public UserResponse submitResponse(UserResponseRequestDto responseDTO) {
 //            Form form = getFormById(responseDTO.getFormId());
@@ -177,10 +177,24 @@ public class FormService {
 //            return userResponseService.saveResponse(userResponse);
 //        }
 
-public long getNumberOfJobs(){
-        return formRepository.countAllById();
-}
-public long getActiveNumberOfJobs(){
- return formRepository.countFormsByStatus(Status.Active);
-}
+    //public long getNumberOfJobsAssigned(){
+//        return formRepository.countFormsByAssignedGigWorkerExists();
+//}
+
+    public List<Object[]> countFormsByStatus() {
+        return formRepository.countFormsByStatus();
     }
+    public List<Object[]> countFormsPerClient() {
+        return formRepository.countFormsPerClient();
+    }
+    public List<Object[]> countFormsAssignedToGigWorkers() {
+        return formRepository.countFormsAssignedToGigWorkers();
+    }
+    public List<Object[]> countProposalsPerForm() {
+        return formRepository.countProposalsPerForm();
+    }
+    public List<Object[]> countFormsPerClientByStatus(Status status) {
+        return formRepository.countFormsPerClientByStatus(status);
+    }
+
+}
