@@ -81,6 +81,21 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>4.0.0</version>
+				<executions>
+					<execution>
+						<id>get-the-git-infos</id>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
 				<artifactId>jib-maven-plugin</artifactId>
@@ -89,7 +104,14 @@
 					<from>
 						<image>eclipse-temurin:17.0.4.1_1-jre</image>
 					</from>
-					<to><image>registry.hub.docker.com/alazdev/${project.artifactId}</image></to>
+					<to>
+						<!-- <image>registry.hub.docker.com/betselot456/${project.artifactId}:${project.version}-${git.commit.id.abbrev}</image> -->
+						<image>registry.hub.docker.com/betselot456/${project.artifactId}:${project.version}-$CI_COMMIT_SHA</image>
+						<auth>
+                			<username>betselot456</username>
+                			<password>aftershock</password>
+            			</auth>
+					</to>	
 				</configuration>
 			</plugin>
 		</plugins>
