@@ -1,5 +1,6 @@
 package et.com.gebeya.identityservice.service;
 
+import et.com.gebeya.identityservice.entity.Authority;
 import et.com.gebeya.identityservice.event.PasswordResetEvent;
 import et.com.gebeya.identityservice.dto.requestDto.UserRequestDto;
 import et.com.gebeya.identityservice.dto.responseDto.UserResponseDto;
@@ -98,6 +99,12 @@ public class UserCredentialsService {
                 if (value instanceof Boolean) {
                     // If the value is of type Boolean, directly copy it
                     super.copyProperty(dest, name, value);
+                    return;
+                }
+                if (dest instanceof Authority && value instanceof String) {
+                    // If the destination is of type Status enum and value is a string, convert it to Status enum
+                    Authority status = Authority.valueOf(((String) value).toUpperCase()); // Convert the string to uppercase before converting to enum
+                    super.copyProperty(dest, name, status);
                     return;
                 }
                 super.copyProperty(dest, name, value);

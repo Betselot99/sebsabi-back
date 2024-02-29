@@ -48,7 +48,9 @@ public class ProposalService {
         // Assign form to gig worker
         Form form = proposal.getForm();
         GigWorker gigWorker = proposal.getGigWorker();
+
         form.setAssignedGigWorker(gigWorker);
         formRepository.save(form);
+
     }
 }

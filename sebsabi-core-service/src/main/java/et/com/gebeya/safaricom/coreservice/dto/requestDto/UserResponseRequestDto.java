@@ -1,4 +1,4 @@
-package et.com.gebeya.safaricom.coreservice.dto.responseDto;
+package et.com.gebeya.safaricom.coreservice.dto.requestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserResponseDto {
+public class UserResponseRequestDto {
     private Long formId;
     private Long questionId;
     private Long gigWorkerId;

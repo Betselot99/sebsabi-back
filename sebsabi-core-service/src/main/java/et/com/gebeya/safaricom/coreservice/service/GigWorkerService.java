@@ -103,7 +103,7 @@ public class GigWorkerService {
         return gigWorkerRepository.save(gigWorker);
     }
 
-    private void updateGigworkersUserInformation(GigWorker gigWorker) {
+    public void updateGigworkersUserInformation(GigWorker gigWorker) {
         // Create a UserRequestDto object with only the password field set
         UserRequestDto updateUser = UserRequestDto.builder()
                 .userId(gigWorker.getId())
@@ -121,6 +121,10 @@ public class GigWorkerService {
         // Log the response from the identity microservice
         // log.info("Response from identity micro service==> {}", response);
     }
+
+
+
+
     public GigwWorkerResponse updateGigworker(Long id, GigWorkerRequest gigWorkerRequest) throws InvocationTargetException, IllegalAccessException {
         Optional<GigWorker> existingGigworkerOptional = gigWorkerRepository.findById(id);
         if (existingGigworkerOptional.isPresent()) {

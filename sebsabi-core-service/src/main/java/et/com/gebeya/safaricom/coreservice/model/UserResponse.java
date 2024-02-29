@@ -1,5 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class UserResponse {
 
     @ManyToOne
     @JoinColumn(name = "form_id")
+    @JsonIgnore
     private Form form;
 
     @ManyToOne

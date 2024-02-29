@@ -61,28 +61,52 @@ public class SecurityConfig {
                     "/api/core/gig-worker/view/profile",
                     "/api/core/gig-worker/view/profile/update",
                     "/api/core/gig-worker/view/forms",
-                    "/api/core/gig-worker/view/forms/proposal/submit"
+                    "/api/core/gig-worker/view/forms/proposal/submit",
+                    "/api/core/gig-worker/view/forms/formQuestion/submit-response"
 
             };
 
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request.requestMatchers(UNAUTHORIZED_MATCHERS).permitAll())
-                .authorizeHttpRequests(request -> request.requestMatchers(ADMIN_MATCHERS).hasAuthority(ADMIN))
-                .authorizeHttpRequests(request -> request.requestMatchers(CLIENT_MATCHERS).hasAuthority(CLIENT))
-                .authorizeHttpRequests(request -> request.requestMatchers(GIGWORKER_MATCHERS).hasAuthority(GIGWORKER))
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            http
+                    .cors(AbstractHttpConfigurer::disable)
+                    .csrf(AbstractHttpConfigurer::disable)
+                    .authorizeHttpRequests(request -> request.requestMatchers(UNAUTHORIZED_MATCHERS).permitAll())
+                    .authorizeHttpRequests(request -> request.requestMatchers(ADMIN_MATCHERS).hasAuthority(ADMIN))
+                    .authorizeHttpRequests(request -> request.requestMatchers(CLIENT_MATCHERS).hasAuthority(CLIENT))
+                    .authorizeHttpRequests(request -> request.requestMatchers(GIGWORKER_MATCHERS).hasAuthority(GIGWORKER))
 
-                .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS)).exceptionHandling(handling -> {
-                    handling.authenticationEntryPoint(unauthorizedEntryPoint());
-                    handling.accessDeniedHandler(accessDeniedHandler());
+                    .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS)).exceptionHandling(handling -> {
+                        handling.authenticationEntryPoint(unauthorizedEntryPoint());
+                        handling.accessDeniedHandler(accessDeniedHandler());
 
-                }).addFilterBefore(new RoleHeaderAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+                    })
+                    .addFilterBefore(new RoleHeaderAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            return http.build();
+        }
+//        @Bean
+//        public SecurityFilterChain formAccessSecurityFilterChain(HttpSecurity http) throws Exception {
+//            http
+//                    .authorizeRequests(authorize -> authorize
+//                            // Define the access rules for specific form endpoints
+//                            .requestMatchers(HttpMethod.GET, "/api/core/gig-worker/forms/view/questionOfForm").access("@formAccessChecker.hasAccess(authentication, request)")
+//                            // Add more rules as needed
+//                            .anyRequest().authenticated()  // Authenticate any other requests
+//                    )
+//                    .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
+//                    .exceptionHandling(handling -> {
+//                        handling.authenticationEntryPoint(unauthorizedEntryPoint());
+//                        handling.accessDeniedHandler(accessDeniedHandler());
+//                    })
+//                    .addFilterBefore(new RoleHeaderAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+//
+//            return http.build();
+//        }
+//    @Bean
+//    public FormAccessChecker formAccessChecker() {
+//        return new FormAccessChecker();
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

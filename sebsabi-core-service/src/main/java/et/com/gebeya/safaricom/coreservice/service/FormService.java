@@ -8,7 +8,7 @@ import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
 import et.com.gebeya.safaricom.coreservice.model.*;
 import et.com.gebeya.safaricom.coreservice.model.enums.QuestionType;
 import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
-import et.com.gebeya.safaricom.coreservice.dto.responseDto.UserResponseDto;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserResponseRequestDto;
 import et.com.gebeya.safaricom.coreservice.repository.specification.FormSpecifications;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.AccessDeniedException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,9 +32,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FormService {
     private final FormRepository formRepository;
-    private final GigWorkerService gigWorkerService;
     private final ClientService clientService;
-    private final UserResponseService userResponseService;
 
     @Transactional
     public JobFormDisplaydto createForm(FormDto formDto, Long clientId) {
@@ -151,32 +148,32 @@ public class FormService {
         }
     }
 
-        public Form getFormForGigWorker(Long gigWorkerId, Long formId) throws AccessDeniedException {
-            return formRepository.findByIdAndAssignedGigWorkerId(formId, gigWorkerId).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
+        public Form getFormForGigWorker(Long formId, Long gig_worker_id) throws AccessDeniedException {
+            return formRepository.findFormByIdAndAssignedGigWorkerId(formId, gig_worker_id).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
         }
 
-        public UserResponse submitResponse(UserResponseDto responseDTO) {
-            Form form = getFormById(responseDTO.getFormId());
-            FormQuestion question = form.getQuestions().stream()
-                    .filter(q -> q.getId().equals(responseDTO.getQuestionId()))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Question not found in the form"));
-
-            GigWorker gigWorker = gigWorkerService.getGigWorkerByIdg(responseDTO.getGigWorkerId());
-
-            UserResponse userResponse = new UserResponse();
-            userResponse.setForm(form);
-            userResponse.setQuestion(question);
-            userResponse.setGigWorker(gigWorker);
-
-            // Create Answer entity and set answerText
-            Answer answer = new Answer();
-            answer.setQuestion(question);
-            answer.setAnswerText(responseDTO.getUserAnswer());
-
-            // Set the answer in the UserResponse entity
-            userResponse.setAnswers(Collections.singletonList(answer));
-
-            return userResponseService.saveResponse(userResponse);
-        }
+//        public UserResponse submitResponse(UserResponseRequestDto responseDTO) {
+//            Form form = getFormById(responseDTO.getFormId());
+//            FormQuestion question = form.getQuestions().stream()
+//                    .filter(q -> q.getId().equals(responseDTO.getQuestionId()))
+//                    .findFirst()
+//                    .orElseThrow(() -> new RuntimeException("Question not found in the form"));
+//
+//            GigWorker gigWorker = gigWorkerService.getGigWorkerByIdg(responseDTO.getGigWorkerId());
+//
+//            UserResponse userResponse = new UserResponse();
+//            userResponse.setForm(form);
+//            userResponse.setQuestion(question);
+//            userResponse.setGigWorker(gigWorker);
+//
+//            // Create Answer entity and set answerText
+//            Answer answer = new Answer();
+//            answer.setQuestion(question);
+//            answer.setAnswerText(responseDTO.getUserAnswer());
+//
+//            // Set the answer in the UserResponse entity
+//            userResponse.setAnswers(Collections.singletonList(answer));
+//
+//            return userResponseService.saveResponse(userResponse);
+//        }
     }
