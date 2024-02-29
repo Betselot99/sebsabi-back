@@ -21,7 +21,8 @@ update-api:
     variables:
         APP_NAME: "api-gateway"
         PROJECT_VERSION: 0.0.1-SNAPSHOT
-        GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        # GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        GIT_COMMIT_ID: $(git log -1 --pretty=format:%h)
         DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}-${GIT_COMMIT_ID}
         MANIFEST_GIT_REPO: https://$USERNAME:$PAT_TOKEN@git.gebeya.training/sebsabi-capstone/deployment-manifests.git
     before_script:
@@ -45,7 +46,8 @@ update-discovery:
     variables:
         APP_NAME: "service_discovery"
         PROJECT_VERSION: 0.0.1-SNAPSHOT
-        GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        # GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        GIT_COMMIT_ID: $(git log -1 --pretty=format:%h)
         DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}-${GIT_COMMIT_ID}
         MANIFEST_GIT_REPO: https://$USERNAME:$PAT_TOKEN@git.gebeya.training/sebsabi-capstone/deployment-manifests.git
     before_script:
@@ -69,7 +71,8 @@ update-identity:
     variables:
         APP_NAME: "identity-service"
         PROJECT_VERSION: 0.0.1-SNAPSHOT
-        GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        # GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        GIT_COMMIT_ID: $(git log -1 --pretty=format:%h)
         DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}-${GIT_COMMIT_ID}
         MANIFEST_GIT_REPO: https://$USERNAME:$PAT_TOKEN@git.gebeya.training/sebsabi-capstone/deployment-manifests.git
     before_script:
@@ -93,7 +96,8 @@ update-notification:
     variables:
         APP_NAME: "notification-service"
         PROJECT_VERSION: 0.0.1-SNAPSHOT
-        GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        # GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        GIT_COMMIT_ID: $(git log -1 --pretty=format:%h)
         DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}-${GIT_COMMIT_ID}
         MANIFEST_GIT_REPO: https://$USERNAME:$PAT_TOKEN@git.gebeya.training/sebsabi-capstone/deployment-manifests.git
     before_script:
@@ -117,7 +121,8 @@ update-core:
     variables:
         APP_NAME: "sebsabi_core_service"
         PROJECT_VERSION: 0.0.1-SNAPSHOT
-        GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        # GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        GIT_COMMIT_ID: "$(git log -1 --pretty=format:%h)"
         DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}-${GIT_COMMIT_ID}
         MANIFEST_GIT_REPO: https://$USERNAME:$PAT_TOKEN@git.gebeya.training/sebsabi-capstone/deployment-manifests.git
     before_script:
