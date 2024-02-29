@@ -167,4 +167,8 @@ public class ClientService {
         return clientRepository.countClientsByIsActive(Status.Active);
     }
 
+    public List<Object[]> countClientsByCompanyType() {
+        return clientRepository.countClientsByCompanyType();
+    }
+
 }
