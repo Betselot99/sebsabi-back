@@ -21,8 +21,5 @@ public class AdministratorController {
 
         return clientService.getAllClients();
     }
-    @GetMapping("/view/number_of_clients")
-    public long getNumberOfClients(){
-        return clientService.getNumberOfClientsActive();
-    }
+
 }

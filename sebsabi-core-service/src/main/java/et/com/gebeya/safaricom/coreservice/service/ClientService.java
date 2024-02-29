@@ -135,9 +135,7 @@ public class ClientService {
         }
     }
 
-    public long getNumberOfClientsActive(){
-        return clientRepository.countClientByIsActive(Status.Active);
-    }
+   
     public static class NullAwareBeanUtilsBean extends BeanUtilsBean {
         @Override
         public void copyProperty(Object dest, String name, Object value) throws IllegalAccessException, InvocationTargetException {
