@@ -4,7 +4,7 @@ import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.AssignRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormQuestionDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
-import et.com.gebeya.safaricom.coreservice.dto.responseDto.UserResponseDto;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserResponseRequestDto;
 import et.com.gebeya.safaricom.coreservice.model.*;
 import et.com.gebeya.safaricom.coreservice.service.FormQuestionService;
 import et.com.gebeya.safaricom.coreservice.service.FormService;
@@ -15,8 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +30,7 @@ public class FormController {
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public JobFormDisplaydto createForm(@RequestBody FormDto formDTO ,@RequestParam Long clientId)  {
+
         JobFormDisplaydto newForm=formService.createForm(formDTO,clientId);
        return newForm;
     }
@@ -69,8 +70,8 @@ public class FormController {
 
 
     @GetMapping("/view/questionOfForm")
-    public List<FormQuestion> viewQuestions(@RequestParam Long formID) throws InvocationTargetException, IllegalAccessException {
-        return formQuestionService.getFormQuestionBYFOrmID(formID);
+    public List<FormQuestion> viewQuestions(@RequestParam Long formID,Long gigworkerId) throws InvocationTargetException, IllegalAccessException, AccessDeniedException {
+        return formQuestionService.getFormQuestionBYFOrmID(formID,gigworkerId);
     }
     @PostMapping("/assign-job")
     public ResponseEntity<GigWorker> assignJobToGigWorker(@RequestBody AssignRequest request) {
@@ -85,9 +86,9 @@ public class FormController {
         Form form = formService.getFormById(formId);
         return ResponseEntity.ok(form);
     }
-    @PostMapping("/submit-response")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse submitResponse(@RequestBody UserResponseDto responseDTO) {
-        return formService.submitResponse(responseDTO);
-    }
+//    @PostMapping("/submit-response")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public UserResponse submitResponse(@RequestBody UserResponseRequestDto responseDTO) {
+//        return formService.submitResponse(responseDTO);
+//    }
 }

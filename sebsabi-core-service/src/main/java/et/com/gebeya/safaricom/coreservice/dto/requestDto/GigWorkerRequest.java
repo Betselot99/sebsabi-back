@@ -1,5 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.dto.requestDto;
 
+import et.com.gebeya.safaricom.coreservice.model.GigWorker;
 import et.com.gebeya.safaricom.coreservice.model.Status;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
@@ -30,4 +31,6 @@ public class GigWorkerRequest {
     private int age;
     private Status isActive;
     private byte[] profileImage;
+
+
 }

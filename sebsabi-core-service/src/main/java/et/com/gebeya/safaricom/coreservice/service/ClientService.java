@@ -135,7 +135,7 @@ public class ClientService {
         }
     }
 
-
+   
     public static class NullAwareBeanUtilsBean extends BeanUtilsBean {
         @Override
         public void copyProperty(Object dest, String name, Object value) throws IllegalAccessException, InvocationTargetException {

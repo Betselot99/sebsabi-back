@@ -16,6 +16,7 @@ import java.util.Optional;
 public interface FormRepository extends JpaRepository<Form, Long> {
     Optional<Form> findByIdAndAssignedGigWorkerId(Long formId, Long gigWorkerId);
 
+    Optional<Form> findFormByIdAndAssignedGigWorkerId(Long id,Long gig_worker_id);
     Optional<Form> findFormByClient_Id(Long client_id);
 
     List<Form> findFormsByClient_Email(String email);
