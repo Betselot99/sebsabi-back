@@ -179,5 +179,8 @@ public class GigWorkerService {
             }
         }
     }
+    public long getNumberofGigWokers(){
+        return gigWorkerRepository.countGigWorkersByIsActive(Status.Active);
+    }
 
 }
