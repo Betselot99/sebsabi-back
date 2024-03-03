@@ -5,14 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class UserResponseRequestDto {
-    private Long formId;
-    private Long gigWorkerId;
-    private List<AnswerDto> answers;
+public class MessageDto {
+    private String messageContent;
 }

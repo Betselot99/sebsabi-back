@@ -34,6 +34,7 @@ public class SecurityConfig {
     public static final String[] UNAUTHORIZED_MATCHERS =
             {
                     "/swagger-ui/**",
+                    "swagger-ui/index.html#/",
                     "/v3/api-docs/**",
                     "/api/core/client/signup",
                     "/api/core/gig-worker/signup"
@@ -54,7 +55,8 @@ public class SecurityConfig {
                     "/api/core/client/view/form/status",
                     "/api/core/client/view/form/proposal/**",
                     "/api/core/client/view/form/proposal/accept/**",
-                    "/api/core/client/view/form/update"
+                    "/api/core/client/view/form/update",
+                    "/api/core/client/view/form/status/{formId}"
             };
     public static final String[] GIGWORKER_MATCHERS =
             {
@@ -62,7 +64,8 @@ public class SecurityConfig {
                     "/api/core/gig-worker/view/profile/update",
                     "/api/core/gig-worker/view/forms",
                     "/api/core/gig-worker/view/forms/proposal/submit",
-                    "/api/core/gig-worker/view/forms/formQuestion/submit-response"
+                    "/api/core/gig-worker/view/forms/formQuestion/submit-response",
+                    "/api/core/gig-worker/view/form/status/{formId}"
 
             };
 

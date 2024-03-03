@@ -11,8 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserResponseRequestDto {
-    private Long formId;
-    private Long gigWorkerId;
-    private List<AnswerDto> answers;
+public class AnswerDto {
+    private Long questionId;
+    private String answerText;
+    private List<Long> selectedOptions; // For multiple choice questions
+    private Integer rating; // For range questions
 }

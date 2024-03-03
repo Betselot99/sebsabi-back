@@ -68,7 +68,8 @@ public class AdministratorController {
         return clientService.countClientsByCompanyType();
     }
     @GetMapping("/formsPerClient/{status}")
-    public List<Object[]> countFormsPerClient(@PathVariable("status") Status status) {
-        return formService.countFormsPerClientByStatus(status);
+    public List<Object[]> countFormsPerClientByStatus(@PathVariable("status") String status) {
+        Status enumStatus = Status.valueOf(status);
+        return formService.countFormsPerClientByStatus(enumStatus);
     }
 }

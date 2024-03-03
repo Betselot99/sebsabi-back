@@ -3,12 +3,15 @@ package et.com.gebeya.safaricom.coreservice.controller;
 
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ProposalDto;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserResponseRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.UserResponse;
 import et.com.gebeya.safaricom.coreservice.service.FormService;
 import et.com.gebeya.safaricom.coreservice.service.GigWorkerService;
 import et.com.gebeya.safaricom.coreservice.service.ProposalService;
+import et.com.gebeya.safaricom.coreservice.service.UserResponseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -27,6 +31,7 @@ public class GigWorkerController {
     private final GigWorkerService gigWorkerService;
     private final ProposalService proposalService;
     private final FormService formService;
+    private final UserResponseService userResponseService;
    @PostMapping("/signup")
 //   @CircuitBreaker(name = "identity",fallbackMethod = "fallBackMethod")
 //   @TimeLimiter(name = "identity")
@@ -68,5 +73,24 @@ public class GigWorkerController {
         proposalDto.setGigWorkerId(Long.valueOf((Integer)userId));
         proposalService.submitProposal(proposalDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Proposal submitted successfully");
+    }
+    @PostMapping("/view/forms/formQuestion/submit-response")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponse submitResponse(@RequestBody UserResponseRequestDto responseDTO) throws AccessDeniedException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        responseDTO.setGigWorkerId(Long.valueOf((Integer)userId));
+        return userResponseService.submitResponse(responseDTO);
+    }
+    @GetMapping("/view/form/status/{formId}")
+    public ResponseEntity<Long> getGigWorkerJobStatus(@PathVariable("formId") long formId) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Object userId = auth.getPrincipal();
+            Long progress = userResponseService.jobStatusForGigWorker(formId,Long.valueOf((Integer)userId));
+            return new ResponseEntity<>(progress, HttpStatus.OK);
+        } catch (AccessDeniedException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 }
