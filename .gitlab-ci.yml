@@ -34,6 +34,7 @@ update-api:
             sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/api-gateway/api-deployment.yaml
         - git stage ./backend/api-gateway/api-deployment.yaml
         - git commit -m "Update the api-gateway image tag [skip-ci]"
+        - git fetch origin main:$CI_COMMIT_REF_NAME
         - git pull origin main:$CI_COMMIT_REF_NAME
         - git push origin main:$CI_COMMIT_REF_NAME
 
