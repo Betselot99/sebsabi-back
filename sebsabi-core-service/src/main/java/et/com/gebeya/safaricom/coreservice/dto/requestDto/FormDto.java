@@ -3,6 +3,8 @@ package et.com.gebeya.safaricom.coreservice.dto.requestDto;
 import et.com.gebeya.safaricom.coreservice.model.Status;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,4 +19,6 @@ public class FormDto {
     private int usageLimit;
     @NonNull
     private Status status;
+    private List<FormQuestionDto> formQuestions; // Add this field for managing FormQuestionDtos
+
 }
