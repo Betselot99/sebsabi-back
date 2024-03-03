@@ -56,7 +56,7 @@ public class SecurityConfig {
                     "/api/core/client/view/form/proposal/**",
                     "/api/core/client/view/form/proposal/accept/**",
                     "/api/core/client/view/form/update",
-                    "/api/core/client/view/form/status"
+                    "/api/core/client/view/form/status/**"
             };
     public static final String[] GIGWORKER_MATCHERS =
             {
@@ -65,7 +65,7 @@ public class SecurityConfig {
                     "/api/core/gig-worker/view/forms",
                     "/api/core/gig-worker/view/forms/proposal/submit",
                     "/api/core/gig-worker/view/forms/formQuestion/submit-response",
-                    "/api/core/gig-worker/view/form/status"
+                    "/api/core/gig-worker/view/form/status/**"
 
             };
 
