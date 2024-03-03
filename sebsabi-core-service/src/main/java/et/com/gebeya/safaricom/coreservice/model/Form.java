@@ -1,13 +1,11 @@
 package et.com.gebeya.safaricom.coreservice.model;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormDto;
+import lombok.*;
+
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.*;
-
 import java.util.List;
 
 @Entity
@@ -23,7 +21,6 @@ public class Form {
     @NotBlank(message = "Title is required")
     private String title;
     @NotBlank(message = "Description is required")
-    @Size(max = 250, message = "Description text must be at most 250 characters")
     private String description;
     @NotBlank(message = "Usage limit is required")
     private int usageLimit;
@@ -34,26 +31,29 @@ public class Form {
     @Valid
     @JsonIgnore
     private Client client;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "form_id")
-    @Valid
-    private List<FormQuestion> questions;
+
     @OneToMany(mappedBy = "form", cascade = CascadeType.ALL, orphanRemoval = true)
     @Valid
     private List<UserResponse> userResponses;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "form_id")
+    @Valid
+    private List<FormQuestion> questions; // Add this field for managing FormQuestions
+
     @OneToMany(mappedBy = "form", cascade = CascadeType.ALL)
     @Valid
     private List<Proposal> proposals;
+
     @ManyToOne
     @JoinColumn(name = "gig_worker_id")
     @Valid
     private GigWorker assignedGigWorker;
-    public Form(FormDto formDto) {
 
-        this.setDescription(formDto.getDescription());
+    public Form(FormDto formDto) {
         this.setTitle(formDto.getTitle());
+        this.setDescription(formDto.getDescription());
         this.setUsageLimit(formDto.getUsageLimit());
         this.setStatus(formDto.getStatus());
-
     }
 }

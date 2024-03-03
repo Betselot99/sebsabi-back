@@ -58,7 +58,7 @@ public class FormService {
                 List<MultipleChoiceOption> options = questionDTO.getMultipleChoiceOptions().stream()
                         .map(optionText -> {
                             MultipleChoiceOption option = new MultipleChoiceOption();
-                            option.setOptionText(optionText);
+                            option.setOptionText(String.valueOf(optionText));
                             option.setFormQuestion(question);
                             return option;
                         })
@@ -135,7 +135,7 @@ public class FormService {
     }
 
 
-    public class NullAwareBeanUtilsBean extends BeanUtilsBean {
+    public static class NullAwareBeanUtilsBean extends BeanUtilsBean {
         @Override
         public void copyProperty(Object dest, String name, Object value) throws IllegalAccessException, InvocationTargetException {
             if (value != null) {

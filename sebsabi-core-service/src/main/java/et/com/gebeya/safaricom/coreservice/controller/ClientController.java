@@ -1,14 +1,13 @@
 package et.com.gebeya.safaricom.coreservice.controller;
 
+import et.com.gebeya.safaricom.coreservice.Exceptions.FormNotFoundException;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
 import et.com.gebeya.safaricom.coreservice.model.Form;
+import et.com.gebeya.safaricom.coreservice.model.FormQuestion;
 import et.com.gebeya.safaricom.coreservice.model.Proposal;
-import et.com.gebeya.safaricom.coreservice.service.ClientService;
-import et.com.gebeya.safaricom.coreservice.service.FormService;
-import et.com.gebeya.safaricom.coreservice.service.ProposalService;
-import et.com.gebeya.safaricom.coreservice.service.UserResponseService;
+import et.com.gebeya.safaricom.coreservice.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +31,7 @@ public class ClientController {
     private final ClientService clientService;
     private final ProposalService proposalService;
     private final FormService formService;
+    private final FormQuestionService formQuestionService;
     private final UserResponseService userResponseService;
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -122,11 +122,34 @@ public class ClientController {
 //    return formService.getForms(formSearch, pageable); // Return the ResponseEntity directly
 //}
 //
-    @PutMapping("/view/form/update")
+
+
+    @PutMapping("/view/form/update/{formId}")
     @ResponseStatus(HttpStatus.OK)
-    public Form updateForm(@RequestParam Long form_id, @RequestBody FormDto formDTO) throws InvocationTargetException, IllegalAccessException {
-        return formService.updateForm(form_id, formDTO);
+    public ResponseEntity<Form> updateForm(@PathVariable Long formId, @RequestBody @Valid FormDto formDto) throws InvocationTargetException, IllegalAccessException {
+        Form updatedForm = formService.updateForm(formId, formDto);
+        return ResponseEntity.ok(updatedForm);
     }
+
+    @PutMapping("/view/form/update/questions")
+    public ResponseEntity<?> updateFormQuestion(@RequestParam Long formId, @RequestBody FormQuestionDto formQuestionDto) {
+        try {
+            FormQuestion updatedQuestion = formQuestionService.updateFormQuestion(formId, formQuestionDto);
+            return ResponseEntity.ok(updatedQuestion);
+        } catch (FormNotFoundException e) {
+            String errorMessage = e.getMessage();
+            if (errorMessage.startsWith("Form not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage); // Return 404 with specific message
+            } else {
+                return ResponseEntity.notFound().build(); // Return 404 with generic message
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // Return 500 with exception message
+        }
+    }
+
+
+
     @GetMapping("/view/form/proposal/{formId}")
     public ResponseEntity<List<Proposal>> getProposalsByFormId(@PathVariable Long formId) {
         List<Proposal> proposals = proposalService.getProposalsByFormId(formId);

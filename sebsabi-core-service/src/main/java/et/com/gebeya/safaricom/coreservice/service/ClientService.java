@@ -30,7 +30,7 @@ public class ClientService {
     private final WebClient.Builder webClientBuilder;
 
     private final KafkaTemplate<String, ClientCreatedEvent> kafkaTemplate;
-
+    @Transactional
     public String createClients(ClientRequest clientRequest) {
         Client client = new Client(clientRequest);
         clientRepository.save(client);
