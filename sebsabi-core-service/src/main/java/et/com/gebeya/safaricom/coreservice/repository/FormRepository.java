@@ -18,6 +18,7 @@ import java.util.Optional;
 public interface FormRepository extends JpaRepository<Form, Long> {
 
     Optional<Form> findFormByIdAndAssignedGigWorkerId(Long id,Long gig_worker_id);
+    Optional<Form> findFormByClient_IdAndId(Long id, Long client_id);
     Optional<Form> findFormByClient_Id(Long client_id);
 
 
@@ -37,5 +38,4 @@ public interface FormRepository extends JpaRepository<Form, Long> {
     List<Object[]> countFormsPerClient();
     @Query("SELECT c.id, COUNT(f) FROM Client c LEFT JOIN c.forms f WHERE f.status = :status GROUP BY c.id")
     List<Object[]> countFormsPerClientByStatus(@Param("status") Status status);
-
 }

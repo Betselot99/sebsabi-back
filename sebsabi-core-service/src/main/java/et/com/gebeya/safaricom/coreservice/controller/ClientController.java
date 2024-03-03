@@ -5,24 +5,22 @@ import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.Proposal;
-import et.com.gebeya.safaricom.coreservice.model.Status;
 import et.com.gebeya.safaricom.coreservice.service.ClientService;
 import et.com.gebeya.safaricom.coreservice.service.FormService;
 import et.com.gebeya.safaricom.coreservice.service.ProposalService;
+import et.com.gebeya.safaricom.coreservice.service.UserResponseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Pageable;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -34,7 +32,7 @@ public class ClientController {
     private final ClientService clientService;
     private final ProposalService proposalService;
     private final FormService formService;
-
+    private final UserResponseService userResponseService;
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
 //   @CircuitBreaker(name = "identity",fallbackMethod = "fallBackMethod")
@@ -64,9 +62,13 @@ public class ClientController {
         Object userId = auth.getPrincipal(); // Get user ID
         return clientService.updateClient(Long.valueOf((Integer)userId), clientRequest);
     }
-
-
-
+    @GetMapping("/status/{formId}")
+    public ResponseEntity<Long> getJobStatus(@PathVariable("formId") long formId) throws AccessDeniedException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        Long progress = userResponseService.jobStatusForClient(formId,Long.valueOf((Integer)userId));
+        return new ResponseEntity<>(progress, HttpStatus.OK);
+    }
 
     @GetMapping("/view/form")
     @ResponseStatus(HttpStatus.OK)
@@ -137,10 +139,15 @@ public class ClientController {
         return ResponseEntity.ok("Proposal accepted successfully");
     }
 
-    @GetMapping("/view/form/status") // Modified mapping to make it unique
-    public List<Form> getAllFormByClientIdAndStatus(@RequestParam Status status) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Object userId = auth.getPrincipal(); // Get user ID
-        return formService.getFormsByClientIdAndStatus(Long.valueOf((Integer) userId), status);
+    @GetMapping("/view/form/status/{formId}") // Modified mapping to make it unique
+    public ResponseEntity<Long> getClientJobStatus(@PathVariable("formId") long formId) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Object userId = auth.getPrincipal();
+            Long progress = userResponseService.jobStatusForClient(formId, Long.valueOf((Integer)userId));
+            return new ResponseEntity<>(progress, HttpStatus.OK);
+        } catch (AccessDeniedException e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 }

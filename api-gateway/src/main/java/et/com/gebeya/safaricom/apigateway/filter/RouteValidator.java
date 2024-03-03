@@ -16,7 +16,11 @@ public class RouteValidator {
             "/api/core/gig-worker/signup",
             "/api/auth/validate",
             "/api/auth/reset-password/**",
-            "/api/auth/reset/update-password"
+            "/api/auth/reset/update-password",
+            "/swagger-ui/**",
+            "/v2/api-docs",
+            "/swagger-resources/**",
+            "/v3/api-docs/swagger-config"
     );
 
     public Predicate<ServerHttpRequest> isSecured =

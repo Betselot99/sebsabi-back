@@ -151,35 +151,10 @@ public class FormService {
     public Form getFormForGigWorker(Long formId, Long gig_worker_id) throws AccessDeniedException {
         return formRepository.findFormByIdAndAssignedGigWorkerId(formId, gig_worker_id).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
     }
+    public Form getFormForClientByFormId(Long formId, Long clientId) throws AccessDeniedException {
+        return formRepository.findFormByClient_IdAndId(formId, clientId).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
+    }
 
-//        public UserResponse submitResponse(UserResponseRequestDto responseDTO) {
-//            Form form = getFormById(responseDTO.getFormId());
-//            FormQuestion question = form.getQuestions().stream()
-//                    .filter(q -> q.getId().equals(responseDTO.getQuestionId()))
-//                    .findFirst()
-//                    .orElseThrow(() -> new RuntimeException("Question not found in the form"));
-//
-//            GigWorker gigWorker = gigWorkerService.getGigWorkerByIdg(responseDTO.getGigWorkerId());
-//
-//            UserResponse userResponse = new UserResponse();
-//            userResponse.setForm(form);
-//            userResponse.setQuestion(question);
-//            userResponse.setGigWorker(gigWorker);
-//
-//            // Create Answer entity and set answerText
-//            Answer answer = new Answer();
-//            answer.setQuestion(question);
-//            answer.setAnswerText(responseDTO.getUserAnswer());
-//
-//            // Set the answer in the UserResponse entity
-//            userResponse.setAnswers(Collections.singletonList(answer));
-//
-//            return userResponseService.saveResponse(userResponse);
-//        }
-
-    //public long getNumberOfJobsAssigned(){
-//        return formRepository.countFormsByAssignedGigWorkerExists();
-//}
 
     public List<Object[]> countFormsByStatus() {
         return formRepository.countFormsByStatus();
@@ -193,6 +168,7 @@ public class FormService {
     public List<Object[]> countProposalsPerForm() {
         return formRepository.countProposalsPerForm();
     }
+
     public List<Object[]> countFormsPerClientByStatus(Status status) {
         return formRepository.countFormsPerClientByStatus(status);
     }
