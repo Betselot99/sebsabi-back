@@ -26,7 +26,6 @@ update-api:
         - git clone $MANIFEST_GIT_REPO
         - git config --global user.name "$GITLAB_USER_NAME"
         - git config --global user.email "$GITLAB_USER_EMAIL"
-        - echo ${GIT_COMMIT_ID}
     script:
         - cd deployment-manifests
         - git remote set-url origin --push $MANIFEST_GIT_REPO
@@ -34,10 +33,10 @@ update-api:
             sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/api-gateway/api-deployment.yaml
         - git stage ./backend/api-gateway/api-deployment.yaml
         - git commit -m "Update the api-gateway image tag [skip-ci]"
-        - git fetch origin main:$CI_COMMIT_REF_NAME
-        - git merge origin/main
-        - git pull origin main:$CI_COMMIT_REF_NAME
-        - git push origin main:$CI_COMMIT_REF_NAME
+        # - git fetch origin main
+        # - git merge origin/main
+        - git pull origin main
+        - git push origin main
 
 update-discovery:
     stage: deploy
@@ -53,7 +52,6 @@ update-discovery:
         - git clone $MANIFEST_GIT_REPO
         - git config --global user.name "$GITLAB_USER_NAME"
         - git config --global user.email "$GITLAB_USER_EMAIL"
-        - echo ${GIT_COMMIT_ID}
     script:
         - cd deployment-manifests
         - git remote set-url origin --push $MANIFEST_GIT_REPO
@@ -61,10 +59,10 @@ update-discovery:
             sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/service-discovery/discovery-deployment.yaml
         - git stage ./backend/service-discovery/discovery-deployment.yaml
         - git commit -m "Update the service-discovery tag [skip-ci]"
-        - git fetch origin main:$CI_COMMIT_REF_NAME
-        - git merge origin/main
-        - git pull origin HEAD:$CI_COMMIT_REF_NAME
-        - git push origin HEAD:$CI_COMMIT_REF_NAME
+        # - git fetch origin main:$CI_COMMIT_REF_NAME
+        # - git merge origin/main
+        - git pull origin main
+        - git push origin main
 
 update-identity:
     stage: deploy
@@ -80,7 +78,6 @@ update-identity:
         - git clone $MANIFEST_GIT_REPO
         - git config --global user.name "$GITLAB_USER_NAME"
         - git config --global user.email "$GITLAB_USER_EMAIL"
-        - echo ${GIT_COMMIT_ID}
     script:
         - cd deployment-manifests
         - git remote set-url origin --push $MANIFEST_GIT_REPO
@@ -88,10 +85,10 @@ update-identity:
             sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/identity-service/identity-deployment.yaml
         - git stage ./backend/identity-service/identity-deployment.yaml
         - git commit -m "Update the identity-service image tag [skip-ci]"
-        - git fetch origin main:$CI_COMMIT_REF_NAME
-        - git merge origin/main
-        - git pull origin HEAD:$CI_COMMIT_REF_NAME
-        - git push origin HEAD:$CI_COMMIT_REF_NAME
+        # - git fetch origin main:$CI_COMMIT_REF_NAME
+        # - git merge origin/main
+        - git pull origin main
+        - git push origin main
 
 update-notification:
     stage: deploy
@@ -107,7 +104,6 @@ update-notification:
         - git clone $MANIFEST_GIT_REPO
         - git config --global user.name "$GITLAB_USER_NAME"
         - git config --global user.email "$GITLAB_USER_EMAIL"
-        - echo ${GIT_COMMIT_ID}
     script:
         - cd deployment-manifests
         - git remote set-url origin --push $MANIFEST_GIT_REPO
@@ -115,10 +111,10 @@ update-notification:
             sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/notification-service/notification-deployment.yaml
         - git stage ./backend/notification-service/notification-deployment.yaml
         - git commit -m "Update the notification-service image tag [skip-ci]"
-        - git fetch origin main:$CI_COMMIT_REF_NAME
-        - git merge origin/main
-        - git pull origin HEAD:$CI_COMMIT_REF_NAME
-        - git push origin HEAD:$CI_COMMIT_REF_NAME
+        # - git fetch origin main:$CI_COMMIT_REF_NAME
+        # - git merge origin/main
+        - git pull origin main
+        - git push origin main
 
 update-core:
     stage: deploy
@@ -142,9 +138,9 @@ update-core:
             sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/core-service/core-deployment.yaml
         - git stage ./backend/core-service/core-deployment.yaml
         - git commit -m "Update the core-service image tag [skip-ci]"
-        - git fetch origin main:$CI_COMMIT_REF_NAME
-        - git merge origin/main
-        - git pull origin HEAD:$CI_COMMIT_REF_NAME
-        - git push origin HEAD:$CI_COMMIT_REF_NAME
+        # - git fetch origin main:$CI_COMMIT_REF_NAME
+        # - git merge origin/main
+        - git pull origin main
+        - git push origin main
 
 
