@@ -34,9 +34,9 @@ update-api:
             sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/api-gateway/api-deployment.yaml
         - git stage ./backend/api-gateway/api-deployment.yaml
         - git commit -m "Update the api-gateway image tag [skip-ci]"
-        - git fetch origin main:$CI_COMMIT_REF_NAME
-        - git pull origin main:$CI_COMMIT_REF_NAME
-        - git push origin main:$CI_COMMIT_REF_NAME
+        # - git fetch origin main:$CI_COMMIT_REF_NAME
+        # - git pull origin main:$CI_COMMIT_REF_NAME
+        - git push origin HEAD:$CI_COMMIT_REF_NAME
 
 update-discovery:
     stage: deploy
@@ -60,8 +60,8 @@ update-discovery:
             sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/service-discovery/discovery-deployment.yaml
         - git stage ./backend/service-discovery/discovery-deployment.yaml
         - git commit -m "Update the service-discovery tag [skip-ci]"
-        - git pull origin main:$CI_COMMIT_REF_NAME
-        - git push origin main:$CI_COMMIT_REF_NAME
+        # - git pull origin main:$CI_COMMIT_REF_NAME
+        - git push origin HEAD:$CI_COMMIT_REF_NAME
 
 update-identity:
     stage: deploy
@@ -85,8 +85,8 @@ update-identity:
             sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/identity-service/identity-deployment.yaml
         - git stage ./backend/identity-service/identity-deployment.yaml
         - git commit -m "Update the identity-service image tag [skip-ci]"
-        - git pull origin main:$CI_COMMIT_REF_NAME
-        - git push origin main:$CI_COMMIT_REF_NAME
+        # - git pull origin main:$CI_COMMIT_REF_NAME
+        - git push origin HEAD:$CI_COMMIT_REF_NAME
 
 update-notification:
     stage: deploy
