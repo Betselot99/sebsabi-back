@@ -5,10 +5,6 @@ stages:
 build_microservices:
   image: betselot456/maven3.8.4-jdk17
   stage: build
-  # variables:
-  #   APP_NAME: "Sebsabi-"
-  #   DOCKER_REGISTRY: "gcr.io"  # Replace with your registry (e.g., Docker Hub, AWS ECR)
-  #  DOCKER_IMAGE: $DOCKER_USER_NAME/${$APP_NAME}${CI_PROJECT_NAME}:$CI_COMMIT_SHA
   before_script:
     # - apt install git
     - mvn clean install -DskipTests  # Install dependencies
@@ -21,119 +17,120 @@ update-api:
     variables:
         APP_NAME: "api-gateway"
         PROJECT_VERSION: 0.0.1-SNAPSHOT
-        GIT_COMMIT_ID: $(git rev-parse --short HEAD)
-        DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}-${GIT_COMMIT_ID}
+        # GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        GIT_COMMIT_ID: "${CI_COMMIT_SHORT_SHA:0:7}"
+        DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}
         MANIFEST_GIT_REPO: https://$USERNAME:$PAT_TOKEN@git.gebeya.training/sebsabi-capstone/deployment-manifests.git
     before_script:
         - apk add git
         - git clone $MANIFEST_GIT_REPO
         - git config --global user.name "$GITLAB_USER_NAME"
         - git config --global user.email "$GITLAB_USER_EMAIL"
-        - echo $GIT_COMMIT_ID
     script:
         - cd deployment-manifests
         - git remote set-url origin --push $MANIFEST_GIT_REPO
+        - git pull origin HEAD:$CI_COMMIT_REF_NAME
         - |
-            sed -i "s#image:.*#image: ${DOCKER_IMAGE}#g" ./backend/api-gateway/api-deployment.yaml
+            sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/api-gateway/api-deployment.yaml
         - git stage ./backend/api-gateway/api-deployment.yaml
         - git commit -m "Update the api-gateway image tag [skip-ci]"
-        - git pull origin $CI_COMMIT_REF_NAME
-        - git push origin main:$CI_COMMIT_REF_NAME
+        - git push -f origin HEAD:$CI_COMMIT_REF_NAME
 
 update-discovery:
     stage: deploy
     variables:
         APP_NAME: "service_discovery"
         PROJECT_VERSION: 0.0.1-SNAPSHOT
-        GIT_COMMIT_ID: $(git rev-parse --short HEAD)
-        DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}-${GIT_COMMIT_ID}
+        # GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        GIT_COMMIT_ID: "${CI_COMMIT_SHORT_SHA:0:7}"
+        DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}
         MANIFEST_GIT_REPO: https://$USERNAME:$PAT_TOKEN@git.gebeya.training/sebsabi-capstone/deployment-manifests.git
     before_script:
         - apk add git
         - git clone $MANIFEST_GIT_REPO
         - git config --global user.name "$GITLAB_USER_NAME"
         - git config --global user.email "$GITLAB_USER_EMAIL"
-        - echo $GIT_COMMIT_ID
     script:
         - cd deployment-manifests
         - git remote set-url origin --push $MANIFEST_GIT_REPO
+        - git pull origin HEAD:$CI_COMMIT_REF_NAME
         - |
-            sed -i "s#image:.*#image: ${DOCKER_IMAGE}#g" ./backend/service-discovery/discovery-deployment.yaml
+            sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/service-discovery/discovery-deployment.yaml
         - git stage ./backend/service-discovery/discovery-deployment.yaml
         - git commit -m "Update the service-discovery tag [skip-ci]"
-        - git pull origin $CI_COMMIT_REF_NAME
-        - git push origin main:$CI_COMMIT_REF_NAME
+        - git push -f origin HEAD:$CI_COMMIT_REF_NAME
 
 update-identity:
     stage: deploy
     variables:
         APP_NAME: "identity-service"
         PROJECT_VERSION: 0.0.1-SNAPSHOT
-        GIT_COMMIT_ID: $(git rev-parse --short HEAD)
-        DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}-${GIT_COMMIT_ID}
+        # GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        GIT_COMMIT_ID: "${CI_COMMIT_SHORT_SHA:0:7}"
+        DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}
         MANIFEST_GIT_REPO: https://$USERNAME:$PAT_TOKEN@git.gebeya.training/sebsabi-capstone/deployment-manifests.git
     before_script:
         - apk add git
         - git clone $MANIFEST_GIT_REPO
         - git config --global user.name "$GITLAB_USER_NAME"
         - git config --global user.email "$GITLAB_USER_EMAIL"
-        - echo $GIT_COMMIT_ID
     script:
         - cd deployment-manifests
         - git remote set-url origin --push $MANIFEST_GIT_REPO
+        - git pull origin HEAD:$CI_COMMIT_REF_NAME
         - |
-            sed -i "s#image:.*#image: ${DOCKER_IMAGE}#g" ./backend/identity-service/identity-deployment.yaml
+            sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/identity-service/identity-deployment.yaml
         - git stage ./backend/identity-service/identity-deployment.yaml
         - git commit -m "Update the identity-service image tag [skip-ci]"
-        - git pull origin $CI_COMMIT_REF_NAME
-        - git push origin main:$CI_COMMIT_REF_NAME
+        - git push -f origin HEAD:$CI_COMMIT_REF_NAME
 
 update-notification:
     stage: deploy
     variables:
         APP_NAME: "notification-service"
         PROJECT_VERSION: 0.0.1-SNAPSHOT
-        GIT_COMMIT_ID: $(git rev-parse --short HEAD)
-        DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}-${GIT_COMMIT_ID}
+        # GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        GIT_COMMIT_ID: "${CI_COMMIT_SHORT_SHA:0:7}"
+        DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}
         MANIFEST_GIT_REPO: https://$USERNAME:$PAT_TOKEN@git.gebeya.training/sebsabi-capstone/deployment-manifests.git
     before_script:
         - apk add git
         - git clone $MANIFEST_GIT_REPO
         - git config --global user.name "$GITLAB_USER_NAME"
         - git config --global user.email "$GITLAB_USER_EMAIL"
-        - echo $GIT_COMMIT_ID
     script:
         - cd deployment-manifests
         - git remote set-url origin --push $MANIFEST_GIT_REPO
+        - git pull origin HEAD:$CI_COMMIT_REF_NAME
         - |
-            sed -i "s#image:.*#image: ${DOCKER_IMAGE}#g" ./backend/notification-service/notification-deployment.yaml
+            sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/notification-service/notification-deployment.yaml
         - git stage ./backend/notification-service/notification-deployment.yaml
         - git commit -m "Update the notification-service image tag [skip-ci]"
-        - git pull origin $CI_COMMIT_REF_NAME
-        - git push origin main:$CI_COMMIT_REF_NAME
+        - git push -f origin HEAD:$CI_COMMIT_REF_NAME
 
 update-core:
     stage: deploy
     variables:
         APP_NAME: "sebsabi_core_service"
         PROJECT_VERSION: 0.0.1-SNAPSHOT
-        GIT_COMMIT_ID: $(git rev-parse --short HEAD)
-        DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}-${GIT_COMMIT_ID}
+        # GIT_COMMIT_ID: "$(git rev-parse --short HEAD)"
+        GIT_COMMIT_ID: "${CI_COMMIT_SHORT_SHA:0:7}"
+        DOCKER_IMAGE: $DOCKER_USER_NAME/${APP_NAME}:${PROJECT_VERSION}
         MANIFEST_GIT_REPO: https://$USERNAME:$PAT_TOKEN@git.gebeya.training/sebsabi-capstone/deployment-manifests.git
     before_script:
         - apk add git
         - git clone $MANIFEST_GIT_REPO
         - git config --global user.name "$GITLAB_USER_NAME"
         - git config --global user.email "$GITLAB_USER_EMAIL"
-        - echo $GIT_COMMIT_ID
+        - echo ${GIT_COMMIT_ID}
     script:
         - cd deployment-manifests
         - git remote set-url origin --push $MANIFEST_GIT_REPO
+        - git pull origin HEAD:$CI_COMMIT_REF_NAME
         - |
-            sed -i "s#image:.*#image: ${DOCKER_IMAGE}#g" ./backend/core-service/core-deployment.yaml
+            sed -i "s#image:.*#image: ${DOCKER_IMAGE}-${CI_COMMIT_SHORT_SHA:0:7}#g" ./backend/core-service/core-deployment.yaml
         - git stage ./backend/core-service/core-deployment.yaml
         - git commit -m "Update the core-service image tag [skip-ci]"
-        - git pull origin $CI_COMMIT_REF_NAME
-        - git push origin main:$CI_COMMIT_REF_NAME
+        - git push -f origin HEAD:$CI_COMMIT_REF_NAME
 
 
