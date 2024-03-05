@@ -18,8 +18,10 @@ import java.util.Optional;
 public interface FormRepository extends JpaRepository<Form, Long> {
 
     Optional<Form> findFormByIdAndAssignedGigWorkerId(Long id,Long gig_worker_id);
-    Optional<Form> findFormByClient_IdAndId(Long id, Long client_id);
+    Optional<Form> findFormByIdAndClient_Id(Long id, Long client_id);
     Optional<Form> findFormByClient_Id(Long client_id);
+
+    List<Form> findFormsByAssignedGigWorkerIdAndStatus(Long gig_worker_id,Status status);
 
 
     List<Form> findFormsByStatus(Status status);

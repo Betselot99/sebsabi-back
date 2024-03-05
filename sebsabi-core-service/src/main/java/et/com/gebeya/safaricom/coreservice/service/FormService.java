@@ -7,8 +7,8 @@ import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
 import et.com.gebeya.safaricom.coreservice.model.*;
 import et.com.gebeya.safaricom.coreservice.model.enums.QuestionType;
-import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserResponseRequestDto;
+import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.repository.specification.FormSpecifications;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +36,8 @@ public class FormService {
 
     @Transactional
     public JobFormDisplaydto createForm(FormDto formDto, Long clientId) {
+        formDto.getStatus();
+
         Form newForm = new Form(formDto);
         Optional<Client> clientInfo = clientService.getClientId(clientId);
         if (clientInfo.isPresent()) {
@@ -91,6 +93,10 @@ public class FormService {
 
     public List<Form> getFormsByStatus(Status status) {
         return formRepository.findFormsByStatus(status);
+    }
+
+    public List<Form> getFormsByStatusClamied(Long gigWorkerId,Status status) {
+        return formRepository.findFormsByAssignedGigWorkerIdAndStatus(gigWorkerId,Status.Claimed);
     }
 
     public List<Form> getFormsByClientIdAndStatus(Long client_id, Status status) {
@@ -152,10 +158,10 @@ public class FormService {
         return formRepository.findFormByIdAndAssignedGigWorkerId(formId, gig_worker_id).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
     }
     public Form getFormForClientByFormId(Long formId, Long clientId) throws AccessDeniedException {
-        return formRepository.findFormByClient_IdAndId(formId, clientId).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
+        return formRepository.findFormByIdAndClient_Id(formId, clientId).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
     }
 
-
+//    Object Mapper
     public List<Object[]> countFormsByStatus() {
         return formRepository.countFormsByStatus();
     }

@@ -5,6 +5,7 @@ import et.com.gebeya.safaricom.coreservice.dto.requestDto.ProposalDto;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.GigWorker;
 import et.com.gebeya.safaricom.coreservice.model.Proposal;
+import et.com.gebeya.safaricom.coreservice.model.Status;
 import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.repository.ProposalRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,7 @@ public class ProposalService {
 
         // Assign form to gig worker
         Form form = proposal.getForm();
+        form.setStatus(Status.Claimed);
         GigWorker gigWorker = proposal.getGigWorker();
 
         form.setAssignedGigWorker(gigWorker);

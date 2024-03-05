@@ -64,7 +64,14 @@ public class GigWorkerController {
         Status status = Status.Posted; // Set the status to "Posted"
         return formService.getFormsByStatus(status);
     }
-
+    @GetMapping("/view/forms/claimed")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Form> getAllFormByClaimed() {
+        Status status = Status.Claimed; // Set the status to "CLaimed"
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        return formService.getFormsByStatusClamied(Long.valueOf((Integer)userId),status);
+    }
     @PostMapping("/view/forms/proposal/submit")
     public ResponseEntity<String> submitProposal(@RequestParam Long form_id ,@RequestBody ProposalDto proposalDto) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

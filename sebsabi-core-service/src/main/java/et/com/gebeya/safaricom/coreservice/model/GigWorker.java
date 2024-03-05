@@ -1,10 +1,7 @@
 package et.com.gebeya.safaricom.coreservice.model;
 
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -27,6 +25,13 @@ public class GigWorker extends Person{
     @JoinColumn(name = "assigned_form_id") // This assumes the column name in your GigWorker table
     @Valid
     private Form assignedForm;
+    // One-to-many relationship with Testimonials
+    @OneToMany(mappedBy = "gigWorker")
+    private List<Testimonial> testimonials;
+
+    // One-to-many relationship with Ratings
+    @OneToMany(mappedBy = "gigWorker")
+    private List<Rating> ratings;
     public GigWorker(GigWorkerRequest gigWorkerRequest){
         this.setFirstName(gigWorkerRequest.getFirstName());
         this.setLastName(gigWorkerRequest.getLastName());

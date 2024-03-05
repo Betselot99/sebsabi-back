@@ -7,6 +7,7 @@ import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.FormQuestion;
 import et.com.gebeya.safaricom.coreservice.model.Proposal;
+import et.com.gebeya.safaricom.coreservice.model.Status;
 import et.com.gebeya.safaricom.coreservice.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -96,8 +97,9 @@ public class ClientController {
 
 
     @PostMapping("/create/form/add/question-to-form")
-    public Form addQuestionsToForm(@RequestParam Long formID, @RequestBody List<FormQuestionDto> questionDTOList) {
-        return formService.addQuestionsToForm(formID, questionDTOList);
+    public ResponseEntity<Form> addQuestionsToForm(@RequestParam Long formID,@RequestBody List<FormQuestionDto> questionDTOs) {
+        Form form = formService.addQuestionsToForm(formID, questionDTOs);
+        return new ResponseEntity<>(form, HttpStatus.CREATED);
     }
 
 //    @GetMapping("/view/form/all-forms/{client_id}")
@@ -105,13 +107,13 @@ public class ClientController {
 //    public Optional<Form> getFormByClientId(@PathVariable Long client_id) {
 //        return formService.getFormByClientId(client_id);
 //    }
-//    @GetMapping("/view/form/status")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<Form> getAllFormByClientIdAndStatus(@RequestParam Status status) {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        Object userId = auth.getPrincipal(); // Get user ID
-//        return formService.getFormsByClientIdAndStatus(Long.valueOf((Integer)userId),status);
-//    }
+    @GetMapping("/view/form/status")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Form> getAllFormByClientIdAndStatus(@RequestParam Status status) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal(); // Get user ID
+        return formService.getFormsByClientIdAndStatus(Long.valueOf((Integer)userId),status);
+    }
 //@GetMapping("/view/forms/by_params")
 //public ResponseEntity<List<Form>> getForms(@RequestParam(required = false) Map<String, String> search,
 //                                           @PageableDefault(page = 0, size = 10) Pageable pageable) {
