@@ -62,7 +62,7 @@ public class SecurityConfig {
             {
                     "/api/core/gig-worker/view/profile",
                     "/api/core/gig-worker/view/profile/update",
-                    "/api/core/gig-worker/view/forms",
+                    "/api/core/gig-worker/view/forms/**",
                     "/api/core/gig-worker/view/forms/proposal/submit",
                     "/api/core/gig-worker/view/forms/formQuestion/submit-response",
                     "/api/core/gig-worker/view/form/**"

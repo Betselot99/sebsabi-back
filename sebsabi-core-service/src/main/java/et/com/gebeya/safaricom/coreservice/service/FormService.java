@@ -1,6 +1,7 @@
 package et.com.gebeya.safaricom.coreservice.service;
 
 
+import et.com.gebeya.safaricom.coreservice.dto.analysisDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormQuestionDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormSearchRequestDto;
@@ -99,6 +100,7 @@ public class FormService {
         return formRepository.findFormsByAssignedGigWorkerIdAndStatus(gigWorkerId,Status.Claimed);
     }
 
+
     public List<Form> getFormsByClientIdAndStatus(Long client_id, Status status) {
         return formRepository.findFormsByClient_IdAndStatus(client_id, status);
     }
@@ -162,21 +164,39 @@ public class FormService {
     }
 
 //    Object Mapper
-    public List<Object[]> countFormsByStatus() {
-        return formRepository.countFormsByStatus();
-    }
-    public List<Object[]> countFormsPerClient() {
-        return formRepository.countFormsPerClient();
-    }
-    public List<Object[]> countFormsAssignedToGigWorkers() {
-        return formRepository.countFormsAssignedToGigWorkers();
-    }
-    public List<Object[]> countProposalsPerForm() {
-        return formRepository.countProposalsPerForm();
+
+    public List<FormsByStatusDTO> countFormsByStatus() {
+        return formRepository.countFormsByStatus()
+                .stream()
+                .map(obj -> new FormsByStatusDTO((Status) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
     }
 
-    public List<Object[]> countFormsPerClientByStatus(Status status) {
-        return formRepository.countFormsPerClientByStatus(status);
+    public List<FormsPerClientDTO> countFormsPerClient() {
+        return formRepository.countFormsPerClient()
+                .stream()
+                .map(obj -> new FormsPerClientDTO((Long) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
     }
 
+    public List<FormsAssignedToGigWorkersDTO> countFormsAssignedToGigWorkers() {
+        return formRepository.countFormsAssignedToGigWorkers()
+                .stream()
+                .map(obj -> new FormsAssignedToGigWorkersDTO((Long) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
+    }
+
+    public List<ProposalsPerFormDTO> countProposalsPerForm() {
+        return formRepository.countProposalsPerForm()
+                .stream()
+                .map(obj -> new ProposalsPerFormDTO((Long) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
+    }
+
+    public List<FormsPerClientByStatusDTO> countFormsPerClientByStatus(Status status) {
+        return formRepository.countFormsPerClientByStatus(status)
+                .stream()
+                .map(obj -> new FormsPerClientByStatusDTO((Long) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
+    }
 }

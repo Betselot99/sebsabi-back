@@ -21,6 +21,7 @@ public class GigwWorkerResponse {
     private String qualification;
     private Date dob;
     private int age;
+    private String password;
     private Status isActive;
 
     public GigwWorkerResponse(GigWorker gigWorker){
@@ -28,6 +29,7 @@ public class GigwWorkerResponse {
         this.firstName = gigWorker.getFirstName();
         this.lastName= gigWorker.getLastName();
         this.qualification= gigWorker.getQualification();
+        this.password= gigWorker.getPassword();
         this.email=gigWorker.getEmail();
         this.dob=gigWorker.getDob();
         this.age=gigWorker.getAge();

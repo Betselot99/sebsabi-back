@@ -1,5 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.controller;
 
+import et.com.gebeya.safaricom.coreservice.dto.analysisDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.model.Client;
@@ -47,28 +48,28 @@ public class AdministratorController {
 //        return formService.getNumberOfJobsAssigned();
 //    }
     @GetMapping("/countByStatus")
-    public List<Object[]> countFormsByStatus() {
+    public List<FormsByStatusDTO> countFormsByStatus() {
         return formService.countFormsByStatus();
     }
 
     @GetMapping("/formsPerClient")
-    public List<Object[]> countFormsPerClient() {
+    public List<FormsPerClientDTO> countFormsPerClient() {
         return formService.countFormsPerClient();
     }
     @GetMapping("/proposalsPerForm")
-    public List<Object[]> countProposalsPerForm() {
+    public List<ProposalsPerFormDTO> countProposalsPerForm() {
         return formService.countProposalsPerForm();
     }
     @GetMapping("/formsAssignedToGigWorkers")
-    public List<Object[]> countFormsAssignedToGigWorkers() {
+    public List<FormsAssignedToGigWorkersDTO> countFormsAssignedToGigWorkers() {
         return formService.countFormsAssignedToGigWorkers();
     }
-    @GetMapping("/countByCompanyType")
-    public List<Object[]> countClientsByCompanyType() {
-        return clientService.countClientsByCompanyType();
-    }
+//    @GetMapping("/countByCompanyType")
+//    public List<Compa> countClientsByCompanyType() {
+//        return clientService.countClientsByCompanyType();
+//    }
     @GetMapping("/formsPerClient/{status}")
-    public List<Object[]> countFormsPerClientByStatus(@PathVariable("status") String status) {
+    public List<FormsPerClientByStatusDTO> countFormsPerClientByStatus(@PathVariable("status") String status) {
         Status enumStatus = Status.valueOf(status);
         return formService.countFormsPerClientByStatus(enumStatus);
     }

@@ -4,6 +4,7 @@ package et.com.gebeya.safaricom.coreservice.controller;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ProposalDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserResponseRequestDto;
+import et.com.gebeya.safaricom.coreservice.dto.responseDto.FormGigworkerDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.Status;
@@ -71,6 +72,14 @@ public class GigWorkerController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
         return formService.getFormsByStatusClamied(Long.valueOf((Integer)userId),status);
+    }
+    @GetMapping("/view/forms/applied")
+    @ResponseStatus(HttpStatus.OK)
+    public List<FormGigworkerDto> getAllFormByApplied() {
+        Status status = Status.Claimed; // Set the status to "Applied"
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        return proposalService.findFormsByGigWorkerId(Long.valueOf((Integer)userId));
     }
     @PostMapping("/view/forms/proposal/submit")
     public ResponseEntity<String> submitProposal(@RequestParam Long form_id ,@RequestBody ProposalDto proposalDto) {
