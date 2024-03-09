@@ -1,6 +1,7 @@
 package et.com.gebeya.safaricom.coreservice.service;
 
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientRequest;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserRequestDto;
 import et.com.gebeya.safaricom.coreservice.event.ClientCreatedEvent;
@@ -8,10 +9,14 @@ import et.com.gebeya.safaricom.coreservice.model.Client;
 import et.com.gebeya.safaricom.coreservice.model.Status;
 import et.com.gebeya.safaricom.coreservice.model.enums.Authority;
 import et.com.gebeya.safaricom.coreservice.repository.ClientRepository;
+import et.com.gebeya.safaricom.coreservice.repository.specification.ClientSpecifications;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -170,5 +175,38 @@ public class ClientService {
     public List<Object[]> countClientsByCompanyType() {
         return clientRepository.countClientsByCompanyType();
     }
+    public Page<Client> searchClients(ClientSearchRequestDto searchRequestDto, Pageable pageable) {
+        String firstName = searchRequestDto.getFirstName();
+        String lastName = searchRequestDto.getLastName();
+        String companyType = searchRequestDto.getCompanyType();
+        String email = searchRequestDto.getEmail();
+        Boolean isActive = searchRequestDto.getIsActive();
 
+
+        Specification<Client> spec = Specification.where(null);
+
+        if (firstName != null && !firstName.isEmpty()) {
+            spec = spec.and(ClientSpecifications.clientByFirstName(firstName));
+        }
+
+        if (lastName != null && !lastName.isEmpty()) {
+            spec = spec.and(ClientSpecifications.clientByLastName(lastName));
+        }
+
+        if (companyType != null && !companyType.isEmpty()) {
+            spec = spec.and(ClientSpecifications.clientByCompanyType(companyType));
+        }
+
+        if (email != null && !email.isEmpty()) {
+            spec = spec.and(ClientSpecifications.clientByEmail(email));
+        }
+        // Adding isActive criteria
+        if (isActive != null) {
+            boolean isActiveValue = isActive;
+            spec = spec.and(ClientSpecifications.clientByIsActive(isActiveValue));
+        }
+
+
+        return clientRepository.findAll(spec, pageable);
+    }
 }

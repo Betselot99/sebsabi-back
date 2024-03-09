@@ -3,7 +3,9 @@ package et.com.gebeya.safaricom.coreservice.service;
 
 import et.com.gebeya.safaricom.coreservice.Exceptions.FormNotFoundException;
 import et.com.gebeya.safaricom.coreservice.Exceptions.GigWorkerNotFoundException;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserRequestDto;
 import et.com.gebeya.safaricom.coreservice.event.ClientCreatedEvent;
@@ -15,9 +17,14 @@ import et.com.gebeya.safaricom.coreservice.model.enums.Authority;
 import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.repository.GigWorkerRepository;
 
+import et.com.gebeya.safaricom.coreservice.repository.specification.ClientSpecifications;
+import et.com.gebeya.safaricom.coreservice.repository.specification.GigworkerSpecifications;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -182,5 +189,38 @@ public class GigWorkerService {
     public long getNumberofGigWokers(){
         return gigWorkerRepository.countGigWorkersByIsActive(Status.Active);
     }
+    public Page<GigWorker> searchGigworker(GigWorkerSearchRequestDto searchRequestDto, Pageable pageable) {
+        String firstName = searchRequestDto.getFirstName();
+        String lastName = searchRequestDto.getLastName();
+        String qualification = searchRequestDto.getQualification();
+        String email = searchRequestDto.getEmail();
+        Boolean isActive = searchRequestDto.getIsActive();
 
+
+        Specification<GigWorker> spec = Specification.where(null);
+
+        if (firstName != null && !firstName.isEmpty()) {
+            spec = spec.and(GigworkerSpecifications.gigWorkerByFirstName(firstName));
+        }
+
+        if (lastName != null && !lastName.isEmpty()) {
+            spec = spec.and(GigworkerSpecifications.gigWorkerByLastName(lastName));
+        }
+
+        if (qualification != null && !qualification.isEmpty()) {
+            spec = spec.and(GigworkerSpecifications.gigWorkerByQualification(qualification));
+        }
+
+        if (email != null && !email.isEmpty()) {
+            spec = spec.and(GigworkerSpecifications.gigWorkerByEmail(email));
+        }
+        // Adding isActive criteria
+        if (isActive != null) {
+            boolean isActiveValue = isActive;
+            spec = spec.and(GigworkerSpecifications.gigWorkerByIsActive(isActiveValue));
+        }
+
+
+        return gigWorkerRepository.findAll(spec, pageable);
+    }
 }
