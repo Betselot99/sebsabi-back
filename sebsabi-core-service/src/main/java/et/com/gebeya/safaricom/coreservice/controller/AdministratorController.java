@@ -1,10 +1,7 @@
 package et.com.gebeya.safaricom.coreservice.controller;
 
 import et.com.gebeya.safaricom.coreservice.dto.analysisDto.*;
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientRequest;
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientSearchRequestDto;
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerSearchRequestDto;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.model.Client;
@@ -54,13 +51,14 @@ public class AdministratorController {
         }
         throw new RuntimeException("Your not authorized to make other changes");
     }
-    @GetMapping("/search/gig-workers")
-    public ResponseEntity<Page<GigWorker>> searchGigworkers(@RequestParam Map<String, String> requestParams,
-                                                            @PageableDefault(size = 10) Pageable pageable) {
-
-        GigWorkerSearchRequestDto searchRequestDto = new GigWorkerSearchRequestDto(requestParams);
-        Page<GigWorker> gigWorkers = gigWorkerService.searchGigworker(searchRequestDto, pageable);
-        return new ResponseEntity<>(gigWorkers, HttpStatus.OK);
+    @GetMapping("/search")
+    public ResponseEntity<Page<Form>> searchForms(
+            @RequestParam Map<String, String> requestParams,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        FormSearchRequestDto searchRequestDto = new FormSearchRequestDto(requestParams);
+        Page<Form> forms = formService.searchForms(searchRequestDto, pageable);
+        return new ResponseEntity<>(forms, HttpStatus.OK);
     }
     @PutMapping("/ban/gig-workers")
     @ResponseStatus(HttpStatus.OK)

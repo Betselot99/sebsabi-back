@@ -53,9 +53,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/reset/password")
-    public UserResponseDto resetPasswordNormally(@RequestBody UserRequestDto userRequestDto) throws InvocationTargetException, IllegalAccessException {
-        return authenticationService.updatePasswordNormally(userRequestDto);
+    public ResponseEntity<UserResponseDto> resetPasswordNormally(@RequestBody UserRequestDto userRequestDto) throws InvocationTargetException, IllegalAccessException {
+        // Assuming userRequestDto includes the new password
+        System.out.println(userRequestDto);
+        return ResponseEntity.ok(authenticationService.updatePasswordNormally(userRequestDto).getBody());
     }
+
 
 
 }

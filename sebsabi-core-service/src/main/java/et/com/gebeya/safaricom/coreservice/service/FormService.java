@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -198,5 +200,39 @@ public class FormService {
                 .stream()
                 .map(obj -> new FormsPerClientByStatusDTO((Long) obj[0], (Long) obj[1]))
                 .collect(Collectors.toList());
+    }
+    public Page<Form> searchForms(FormSearchRequestDto searchRequestDto, Pageable pageable) {
+        Specification<Form> spec = Specification.where(null);
+
+        String title = searchRequestDto.getTitle();
+        if (title != null && !title.isEmpty()) {
+            spec = spec.and(FormSpecifications.formByTitle(title));
+        }
+
+        LocalDate createdOn = searchRequestDto.getCreatedOn();
+        if (createdOn != null) {
+            spec = spec.and(FormSpecifications.formByCreatedOn(createdOn));
+        }
+
+        return formRepository.findAll(spec, pageable);
+    }
+    public Page<Form> searchClientForms(FormSearchRequestDto searchRequestDto,Long clientId, Pageable pageable) {
+
+        Specification<Form> spec = Specification.where(null);
+
+        String title = searchRequestDto.getTitle();
+        if (title != null && !title.isEmpty()) {
+            spec = spec.and(FormSpecifications.formByTitle(title));
+        }
+
+        LocalDate createdOn = searchRequestDto.getCreatedOn();
+        if (createdOn != null) {
+            spec = spec.and(FormSpecifications.formByCreatedOn(createdOn));
+        }
+
+        // Add specification to filter by client ID
+        spec = spec.and(FormSpecifications.formByClientId(clientId));
+
+        return formRepository.findAll(spec, pageable);
     }
 }

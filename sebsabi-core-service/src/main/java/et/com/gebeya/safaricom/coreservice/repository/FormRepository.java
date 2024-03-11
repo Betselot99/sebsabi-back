@@ -39,4 +39,6 @@ public interface FormRepository extends JpaRepository<Form, Long> {
     List<Object[]> countFormsPerClient();
     @Query("SELECT c.id, COUNT(f) FROM Client c LEFT JOIN c.forms f WHERE f.status = :status GROUP BY c.id")
     List<Object[]> countFormsPerClientByStatus(@Param("status") Status status);
+
+    Page<Form> findAll(Specification<Form> spec, Pageable pageable);
 }

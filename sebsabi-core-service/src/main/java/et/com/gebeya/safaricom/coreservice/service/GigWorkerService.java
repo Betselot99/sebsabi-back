@@ -26,6 +26,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -110,12 +112,18 @@ public class GigWorkerService {
         return gigWorkerRepository.save(gigWorker);
     }
 
-    public void updateGigworkersUserInformation(GigWorker gigWorker) {
+    public void updateGigworkersUserInformation(GigWorker gigWorker,String newPassword) {
+        // Create a UserRequestDto object with only the password field set
         // Create a UserRequestDto object with only the password field set
         UserRequestDto updateUser = UserRequestDto.builder()
                 .userId(gigWorker.getId())
-                .password(gigWorker.getPassword()) // Assuming this is the password field in the Client object
+                .userName(gigWorker.getEmail())
+                .name(gigWorker.getFirstName())
+                .password(newPassword)
+                .authority(Authority.CLIENT)
+                .isActive(true)
                 .build(); // Build the UserRequestDto object
+        log.info(updateUser.toString());
 
         // Make a POST request to update the password in the identity service
         String response = webClientBuilder.build().post()
@@ -140,9 +148,10 @@ public class GigWorkerService {
             // Check if the ClientRequest contains a non-null password
             if (gigWorkerRequest.getPassword() != null && !gigWorkerRequest.getPassword().isEmpty()) {
                 // If password is being updated, call updateClientsUserInformation method
-                existingGigworker.setPassword(gigWorkerRequest.getPassword());
 
-                updateGigworkersUserInformation(existingGigworker);
+
+                updateGigworkersUserInformation(existingGigworker,gigWorkerRequest.getPassword());
+                existingGigworker.setPassword(passwordEncoder().encode(gigWorkerRequest.getPassword()));
             }
 
             // Use NullAwareBeanUtilsBean to handle null properties
@@ -157,6 +166,9 @@ public class GigWorkerService {
         } else {
             throw new RuntimeException("Client not found with id: " + id);
         }
+    }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 

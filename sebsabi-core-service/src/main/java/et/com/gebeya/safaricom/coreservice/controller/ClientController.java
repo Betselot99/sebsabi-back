@@ -12,6 +12,9 @@ import et.com.gebeya.safaricom.coreservice.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -58,7 +62,7 @@ public class ClientController {
     }
     @PutMapping("/view/profile/update")
     @ResponseStatus(HttpStatus.OK)
-    public ClientResponse updateForm(@RequestBody ClientRequest clientRequest) throws InvocationTargetException, IllegalAccessException {
+    public ClientResponse updateProfile(@RequestBody ClientRequest clientRequest) throws InvocationTargetException, IllegalAccessException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal(); // Get user ID
         return clientService.updateClient(Long.valueOf((Integer)userId), clientRequest);
@@ -84,6 +88,17 @@ public class ClientController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No form created");
         }
+    }
+    @GetMapping("/search/form")
+    public ResponseEntity<Page<Form>> searchForms(
+            @RequestParam Map<String, String> requestParams,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal(); // Get user ID
+        FormSearchRequestDto searchRequestDto = new FormSearchRequestDto(requestParams);
+        Page<Form> forms = formService.searchClientForms(searchRequestDto,Long.valueOf((Integer)userId),pageable);
+        return new ResponseEntity<>(forms, HttpStatus.OK);
     }
 
     //add form
@@ -126,9 +141,9 @@ public class ClientController {
 //
 
 
-    @PutMapping("/view/form/update/{formId}")
+    @PutMapping("/view/form/update")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Form> updateForm(@PathVariable Long formId, @RequestBody @Valid FormDto formDto) throws InvocationTargetException, IllegalAccessException {
+    public ResponseEntity<Form> updateForm(@RequestParam Long formId, @RequestBody @Valid FormDto formDto) throws InvocationTargetException, IllegalAccessException {
         Form updatedForm = formService.updateForm(formId, formDto);
         return ResponseEntity.ok(updatedForm);
     }

@@ -70,6 +70,21 @@ public class AuthConfig {
             usersService.createUpdateUser(users);
         }
     }
+//    private void createClientUser() {
+//        try {
+//            UserCredentials users = usersService.loadUserByUsername("admin");
+//        } catch (Exception e) {
+//            UserCredentials users = UserCredentials.builder()
+//                    .name("Alazar")
+//                    .isActive(true)
+//                    .authority(Authority.CLIENT)
+//                    .userName("alazartilahun13@gmail.com")
+//                    .userId(0L)
+//                    .password(passwordEncoder().encode("152415"))
+//                    .build();
+//            usersService.createUpdateUser(users);
+//        }
+//    }
 
 
     @Bean
