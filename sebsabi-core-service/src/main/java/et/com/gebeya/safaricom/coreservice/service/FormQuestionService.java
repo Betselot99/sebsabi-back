@@ -40,35 +40,40 @@ public class FormQuestionService {
 
 
 
-    public FormQuestion updateFormQuestion(Long formId, FormQuestionDto formQuestionDto) {
-        Long questionId = formQuestionDto.getId();
-        Optional<FormQuestion> optionalQuestion = formQuestionRepository.findById(questionId);
-        if (optionalQuestion.isPresent()) {
-            FormQuestion existingQuestion = optionalQuestion.get();
-            if (!existingQuestion.getForm().getId().equals(formId)) {
-                throw new FormNotFoundException("Form question with ID " + questionId + " does not belong to form with ID " + formId);
-            }
+    public List<FormQuestion> updateFormQuestions(Long formId, List<FormQuestionDto> formQuestionDtoList) {
+        List<FormQuestion> updatedQuestions = new ArrayList<>();
 
-            try {
-                NullAwareBeanUtilsBean beanUtils = new NullAwareBeanUtilsBean();
-                beanUtils.copyProperties(existingQuestion, formQuestionDto);
-
-                // Update multiple choice option if necessary
-                if (existingQuestion.getQuestionType() == QuestionType.MULTIPLE_CHOICE) {
-                    updateMultipleChoiceOption(existingQuestion, formQuestionDto);
+        for (FormQuestionDto formQuestionDto : formQuestionDtoList) {
+            Long questionId = formQuestionDto.getId();
+            Optional<FormQuestion> optionalQuestion = formQuestionRepository.findById(questionId);
+            if (optionalQuestion.isPresent()) {
+                FormQuestion existingQuestion = optionalQuestion.get();
+                if (!existingQuestion.getForm().getId().equals(formId)) {
+                    throw new FormNotFoundException("Form question with ID " + questionId + " does not belong to form with ID " + formId);
                 }
 
-                return formQuestionRepository.save(existingQuestion);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                // Handle exception
-                e.printStackTrace();
-                throw new RuntimeException("Error while updating form question");
-            }
-        } else {
-            throw new FormNotFoundException("Form question not found with ID: " + questionId);
-        }
-    }
+                try {
+                    NullAwareBeanUtilsBean beanUtils = new NullAwareBeanUtilsBean();
+                    beanUtils.copyProperties(existingQuestion, formQuestionDto);
 
+                    // Update multiple choice option if necessary
+                    if (existingQuestion.getQuestionType() == QuestionType.MULTIPLE_CHOICE) {
+                        updateMultipleChoiceOption(existingQuestion, formQuestionDto);
+                    }
+
+                    updatedQuestions.add(formQuestionRepository.save(existingQuestion));
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    // Handle exception
+                    e.printStackTrace();
+                    throw new RuntimeException("Error while updating form question");
+                }
+            } else {
+                throw new FormNotFoundException("Form question not found with ID: " + questionId);
+            }
+        }
+
+        return updatedQuestions;
+    }
     private void updateMultipleChoiceOption(FormQuestion existingQuestion, FormQuestionDto formQuestionDto) {
         List<MultipleChoiceOption> existingOptions = existingQuestion.getMultipleChoiceOptions();
         String optionToUpdate = formQuestionDto.getOptionToUpdate();

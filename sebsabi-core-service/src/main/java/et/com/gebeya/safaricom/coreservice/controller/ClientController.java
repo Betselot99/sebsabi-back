@@ -2,12 +2,11 @@ package et.com.gebeya.safaricom.coreservice.controller;
 
 import et.com.gebeya.safaricom.coreservice.Exceptions.FormNotFoundException;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.*;
+import et.com.gebeya.safaricom.coreservice.dto.responseDto.AnswerAnalysisDTO;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
-import et.com.gebeya.safaricom.coreservice.model.Form;
-import et.com.gebeya.safaricom.coreservice.model.FormQuestion;
-import et.com.gebeya.safaricom.coreservice.model.Proposal;
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.dto.responseDto.OptionSelectionCountDTO;
+import et.com.gebeya.safaricom.coreservice.model.*;
 import et.com.gebeya.safaricom.coreservice.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +37,7 @@ public class ClientController {
     private final FormService formService;
     private final FormQuestionService formQuestionService;
     private final UserResponseService userResponseService;
+    private final AnswerService answerService;
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
 //   @CircuitBreaker(name = "identity",fallbackMethod = "fallBackMethod")
@@ -149,10 +149,10 @@ public class ClientController {
     }
 
     @PutMapping("/view/form/update/questions")
-    public ResponseEntity<?> updateFormQuestion(@RequestParam Long formId, @RequestBody FormQuestionDto formQuestionDto) {
+    public ResponseEntity<?> updateFormQuestions(@RequestParam Long formId, @RequestBody List<FormQuestionDto> formQuestionDtoList) {
         try {
-            FormQuestion updatedQuestion = formQuestionService.updateFormQuestion(formId, formQuestionDto);
-            return ResponseEntity.ok(updatedQuestion);
+            List<FormQuestion> updatedQuestions = formQuestionService.updateFormQuestions(formId, formQuestionDtoList);
+            return ResponseEntity.ok(updatedQuestions);
         } catch (FormNotFoundException e) {
             String errorMessage = e.getMessage();
             if (errorMessage.startsWith("Form not found")) {
@@ -164,6 +164,7 @@ public class ClientController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage()); // Return 500 with exception message
         }
     }
+
 
 
 
@@ -188,6 +189,21 @@ public class ClientController {
             return new ResponseEntity<>(progress, HttpStatus.OK);
         } catch (AccessDeniedException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @GetMapping("/view/form/completed/analyze")
+    public AnswerAnalysisDTO analyzeAnswers(@RequestParam Long formId) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Object userId = auth.getPrincipal();
+            // Analyze answers for the provided form ID
+            return answerService.analyzeAnswers(formId,Long.valueOf((Integer)userId));
+        } catch (FormNotFoundException ex) {
+            // Handle the form not found exception
+            throw new FormNotFoundException(ex.getMessage());
+        } catch (AccessDeniedException e) {
+            throw new RuntimeException(e);
         }
     }
 }

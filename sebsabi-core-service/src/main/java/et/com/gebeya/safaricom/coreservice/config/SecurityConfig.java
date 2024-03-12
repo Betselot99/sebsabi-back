@@ -38,7 +38,7 @@ public class SecurityConfig {
                     "/v3/api-docs/**",
                     "/api/core/client/signup",
                     "/api/core/gig-worker/signup",
-                    "/api/core/generateContent"
+                    "/api/core/calculate"
 
             };
     public static final String[] ADMIN_MATCHERS = {
@@ -58,7 +58,8 @@ public class SecurityConfig {
                     "/api/core/client/view/form/update",
                     "/api/core/client/search/form",
                     "/api/core/client/view/form/status/**",
-                    "/api/core/client/view/form/update/questions/**"
+                    "/api/core/client/view/form/update/questions/**",
+                    "api/core/client/view/form/completed/analyze"
             };
     public static final String[] GIGWORKER_MATCHERS =
             {

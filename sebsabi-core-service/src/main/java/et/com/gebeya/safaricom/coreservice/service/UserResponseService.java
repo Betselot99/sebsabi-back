@@ -86,7 +86,12 @@ public class UserResponseService {
             userResponse.setAnswers(answers);
 
             // Save the UserResponse entity
-            return userResponseRepository.save(userResponse);
+            if (form.getUsageLimit() - countUserResponsesByFormId(form.getId()) == 1) {
+                form.setStatus(Status.Completed);
+            }
+            formRepository.save(form);
+            userResponse=userResponseRepository.save(userResponse);
+            return userResponse;
         } else {
             form.setStatus(Status.Completed);
             formRepository.save(form);
