@@ -7,6 +7,7 @@ import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentDto;
 import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentResponseDto;
 import et.com.gebeya.safaricom.coreservice.model.Payment;
 import et.com.gebeya.safaricom.coreservice.repository.PaymentRepository;
+import et.com.gebeya.safaricom.coreservice.util.constants.SecurityConstants.MappingUtil;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,7 +21,7 @@ public class PaymentService {
     }
 
     TransferPaymentResponseDto createPayment(PaymentDto paymentDto){
-        Payment payment = MappingUtil.mapBalanceRequestDtoBalance(paymentDto);
+        Payment payment = MappingUtil.mapBalanceRequestDtoToBalance(paymentDto);
         payment.setAmount(BigDecimal.valueOf(0.0));
         payment = (Payment) paymentRepository.save(payment);
         return MappingUtil.mapBalanceToBalanceResponseDto(payment);
@@ -33,35 +34,63 @@ public class PaymentService {
         if(provider.getAmount().compareTo(paymentDto.getBalance())<0)
             throw new InsufficientAmountException("Your Balance is Insufficient. Please Add more Amount");
         provider.setAmount(provider.getAmount().subtract(paymentDto.getBalance()));
-        return MappingUtil.mpaBalanceToBalanceResponseDto(paymentRepository.save(provider));
+        return MappingUtil.mapBalanceToBalanceResponseDto((Payment) paymentRepository.save(provider));
             }
     TransferPaymentResponseDto depositBalance(PaymentDto paymentDto){
-        Payment driver = getUser(paymentDto.getUserId());
-        driver.setAmount(driver.getAmount().add(paymentDto.getBalance()));
-        return MappingUtil.mapBalanceToBalanceResponseDto(paymentRepository.save(driver));
+        Payment client = getUser(paymentDto.getUserId());
+        client.setAmount(client.getAmount().add(paymentDto.getBalance()));
+        return MappingUtil.mapBalanceToBalanceResponseDto((Payment) paymentRepository.save(driver));
     }
-    TransferPaymentResponseDto transferPayment(TransferPaymentDto transferPaymentDto){
+    public TransferPaymentResponseDto transferPaymentFromClientToAdmin(TransferPaymentDto transferPaymentDto) {
         BigDecimal adminCommission = transferPaymentDto.getAmount().multiply(BigDecimal.valueOf(0.1));
         BigDecimal amountAfterCommission = transferPaymentDto.getAmount().subtract(adminCommission);
 
         // Transfer payment from client account to admin account
-        Payment adminAccount = getUser(transferPaymentDto.getAdminAccountId());
-        adminAccount.setAmount(adminAccount.getAmount().add(amountAfterCommission));
-        paymentRepository.save(adminAccount);
-
-        // Transfer payment from admin account to gig worker account
-        Payment gigWorkerAccount = getUser(transferPaymentDto.getGigWorkerId());
-        gigWorkerAccount.setAmount(gigWorkerAccount.getAmount().add(amountAfterCommission));
-        paymentRepository.save(gigWorkerAccount);
-
-        // Prepare response
         TransferPaymentResponseDto responseDto = new TransferPaymentResponseDto();
         responseDto.setAmountTransferred(amountAfterCommission);
         responseDto.setAdminCommission(adminCommission);
-        responseDto.setGigWorkerId(transferPaymentDto.getGigWorkerId());
-        responseDto.setMessage("Payment transferred successfully.");
+        responseDto.setMessage("Payment transferred successfully from client to admin.");
+
+        // Assuming you have logic to update admin account balance in the database
+
         return responseDto;
     }
+
+    public TransferPaymentResponseDto transferPaymentFromAdminToGigWorker(TransferPaymentDto transferPaymentDto) {
+        BigDecimal amountToTransfer = transferPaymentDto.getAmount();
+
+        // Transfer payment from admin account to gig worker account
+        TransferPaymentResponseDto responseDto = new TransferPaymentResponseDto();
+        responseDto.setAmountTransferred(amountToTransfer);
+        responseDto.setMessage("Payment transferred successfully from admin to gig worker.");
+
+        // Assuming you have logic to update gig worker account balance in the database
+
+        return responseDto;
+    }
+
+    //    TransferPaymentResponseDto transferPayment(TransferPaymentDto transferPaymentDto){
+//        BigDecimal adminCommission = transferPaymentDto.getAmount().multiply(BigDecimal.valueOf(0.1));
+//        BigDecimal amountAfterCommission = transferPaymentDto.getAmount().subtract(adminCommission);
+//
+//        // Transfer payment from client account to admin account
+//        Payment adminAccount = getUser(transferPaymentDto.getAdminAccountId());
+//        adminAccount.setAmount(adminAccount.getAmount().add(amountAfterCommission));
+//        paymentRepository.save(adminAccount);
+//
+//        // Transfer payment from admin account to gig worker account
+//        Payment gigWorkerAccount = getUser(transferPaymentDto.getGigWorkerId());
+//        gigWorkerAccount.setAmount(gigWorkerAccount.getAmount().add(amountAfterCommission));
+//        paymentRepository.save(gigWorkerAccount);
+//
+//        // Prepare response
+//        TransferPaymentResponseDto responseDto = new TransferPaymentResponseDto();
+//        responseDto.setAmountTransferred(amountAfterCommission);
+//        responseDto.setAdminCommission(adminCommission);
+//        responseDto.setGigWorkerId(transferPaymentDto.getGigWorkerId());
+//        responseDto.setMessage("Payment transferred successfully.");
+//        return responseDto;
+//    }
     TransferPaymentResponseDto checkBalance(String id){
         Payment payment = getUser(id);
         return MappingUtil.mapBalanceToBalanceResponseDto(payment);
