@@ -77,6 +77,8 @@ public class ProposalService {
                 .distinct() // Optional: If you want unique forms only
                 .collect(Collectors.toList());
     }
-
+    public Proposal findProposalByFormIdAndGigWorkerId(Long formId, Long gigworkerId){
+        return proposalRepository.findProposalByFormIdAndGigWorkerId(formId, gigworkerId);
+    }
 
 }

@@ -6,6 +6,7 @@ public enum Status {
     Draft,
     Claimed,
     Completed,
-    Posted
-
+    Posted,
+Paid,
+    Deposited
 }

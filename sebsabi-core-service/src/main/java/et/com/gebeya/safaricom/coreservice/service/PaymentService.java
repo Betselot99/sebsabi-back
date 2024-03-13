@@ -5,20 +5,25 @@ import et.com.gebeya.safaricom.coreservice.Exceptions.PaymentAccountNotFoundExce
 import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.PaymentDto;
 import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentDto;
 import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentResponseDto;
-import et.com.gebeya.safaricom.coreservice.model.Payment;
+import et.com.gebeya.safaricom.coreservice.model.*;
+import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.repository.PaymentRepository;
 import et.com.gebeya.safaricom.coreservice.util.constants.SecurityConstants.MappingUtil;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
+    private final FormService formService;
+    private final ProposalService proposalService;
+    private final FormRepository formRepository;
 
-    public PaymentService(PaymentRepository paymentRepository) {
-        this.paymentRepository = paymentRepository;
-    }
 
     TransferPaymentResponseDto createPayment(PaymentDto paymentDto){
         Payment payment = MappingUtil.mapBalanceRequestDtoToBalance(paymentDto);
@@ -27,46 +32,62 @@ public class PaymentService {
         return MappingUtil.mapBalanceToBalanceResponseDto(payment);
     }
 
-    TransferPaymentResponseDto payingBalance(PaymentDto paymentDto){
-        Payment provider = getUser(paymentDto.getUserId());
-        if(paymentDto.getBalance().compareTo(BigDecimal.valueOf(100))< 0)
-            throw new InsufficientAmountException("You don't have enough Amount to make payment");
-        if(provider.getAmount().compareTo(paymentDto.getBalance())<0)
-            throw new InsufficientAmountException("Your Balance is Insufficient. Please Add more Amount");
-        provider.setAmount(provider.getAmount().subtract(paymentDto.getBalance()));
-        return MappingUtil.mapBalanceToBalanceResponseDto((Payment) paymentRepository.save(provider));
-            }
+//    TransferPaymentResponseDto payingBalance(PaymentDto paymentDto){
+//        Payment provider = getUser(paymentDto.getUserId());
+//        if(paymentDto.getBalance().compareTo(BigDecimal.valueOf(100))< 0)
+//            throw new InsufficientAmountException("You don't have enough Amount to make payment");
+//        if(provider.getAmount().compareTo(paymentDto.getBalance())<0)
+//            throw new InsufficientAmountException("Your Balance is Insufficient. Please Add more Amount");
+//        provider.setAmount(provider.getAmount().subtract(paymentDto.getBalance()));
+//        return MappingUtil.mapBalanceToBalanceResponseDto((Payment) paymentRepository.save(provider));
+//            }
     TransferPaymentResponseDto depositBalance(PaymentDto paymentDto){
-        Payment client = getUser(paymentDto.getUserId());
+        Payment client = getUser(String.valueOf(paymentDto.getUserId()));
         client.setAmount(client.getAmount().add(paymentDto.getBalance()));
-        return MappingUtil.mapBalanceToBalanceResponseDto((Payment) paymentRepository.save(driver));
+        return MappingUtil.mapBalanceToBalanceResponseDto((Payment) paymentRepository.save(client));
     }
-    public TransferPaymentResponseDto transferPaymentFromClientToAdmin(TransferPaymentDto transferPaymentDto) {
+    @Transactional
+    public TransferPaymentResponseDto transferPaymentFromClientToAdmin(TransferPaymentDto transferPaymentDto, Long formId) throws AccessDeniedException {
+    Form form = formService.getFormForClientByFormId(formId, transferPaymentDto.getClientId());
+    if(form != null){
+        GigWorker assignedGigWorker = form.getAssignedGigWorker();
+        Proposal proposal = proposalService.findProposalByFormIdAndGigWorkerId(form.getId(), assignedGigWorker.getId());
+        Double amount = proposal.getRatePerForm()*form.getUsageLimit();
+        transferPaymentDto.setAmount(BigDecimal.valueOf(amount));
         BigDecimal adminCommission = transferPaymentDto.getAmount().multiply(BigDecimal.valueOf(0.1));
         BigDecimal amountAfterCommission = transferPaymentDto.getAmount().subtract(adminCommission);
-
+        form.setStatus(Status.Paid);
         // Transfer payment from client account to admin account
         TransferPaymentResponseDto responseDto = new TransferPaymentResponseDto();
         responseDto.setAmountTransferred(amountAfterCommission);
         responseDto.setAdminCommission(adminCommission);
         responseDto.setMessage("Payment transferred successfully from client to admin.");
+        Payment payment = new Payment(responseDto);
+        paymentRepository.save(payment);
+        formRepository.save(form);
 
-        // Assuming you have logic to update admin account balance in the database
-
+        transferPaymentFromAdminToGigWorker(transferPaymentDto, formId);
         return responseDto;
     }
+    throw new RuntimeException("Form Not Found");
+    }
+@Transactional
+    public TransferPaymentResponseDto transferPaymentFromAdminToGigWorker(TransferPaymentDto transferPaymentDto, Long formId) {
+       Form form = formService.getFormById(formId);
+       if (form.getStatus()==Status.Paid){
+           BigDecimal amountToTransfer = transferPaymentDto.getAmount();
 
-    public TransferPaymentResponseDto transferPaymentFromAdminToGigWorker(TransferPaymentDto transferPaymentDto) {
-        BigDecimal amountToTransfer = transferPaymentDto.getAmount();
-
-        // Transfer payment from admin account to gig worker account
-        TransferPaymentResponseDto responseDto = new TransferPaymentResponseDto();
-        responseDto.setAmountTransferred(amountToTransfer);
-        responseDto.setMessage("Payment transferred successfully from admin to gig worker.");
-
-        // Assuming you have logic to update gig worker account balance in the database
-
-        return responseDto;
+           // Transfer payment from admin account to gig worker account
+           TransferPaymentResponseDto responseDto = new TransferPaymentResponseDto();
+           responseDto.setAmountTransferred(amountToTransfer);
+           responseDto.setMessage("Payment transferred successfully from admin to gig worker.");
+           responseDto.setGigWorkerId(form.getAssignedGigWorker().getId());
+           responseDto.setClientId(form.getClient().getId());
+           Payment payment = new Payment(responseDto);
+           paymentRepository.save(payment);
+           return responseDto;
+       }
+throw new RuntimeException("Failed to transfer");
     }
 
     //    TransferPaymentResponseDto transferPayment(TransferPaymentDto transferPaymentDto){

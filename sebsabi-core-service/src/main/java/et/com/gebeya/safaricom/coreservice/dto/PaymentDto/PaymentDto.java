@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentDto {
-    private String userId;
+    private long userId;
     private BigDecimal balance;
 
 }

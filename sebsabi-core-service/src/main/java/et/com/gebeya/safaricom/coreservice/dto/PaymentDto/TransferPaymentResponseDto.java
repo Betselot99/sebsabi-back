@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 public class TransferPaymentResponseDto {
     private BigDecimal amountTransferred;
     private BigDecimal adminCommission;
-    private String gigWorkerId;
+    private long gigWorkerId;
     private String message;
+    private long clientId;
 }

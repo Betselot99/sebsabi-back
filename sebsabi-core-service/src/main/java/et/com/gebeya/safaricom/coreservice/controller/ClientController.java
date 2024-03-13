@@ -1,6 +1,8 @@
 package et.com.gebeya.safaricom.coreservice.controller;
 
 import et.com.gebeya.safaricom.coreservice.Exceptions.FormNotFoundException;
+import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentDto;
+import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentResponseDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.AnswerAnalysisDTO;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
@@ -38,6 +40,7 @@ public class ClientController {
     private final FormQuestionService formQuestionService;
     private final UserResponseService userResponseService;
     private final AnswerService answerService;
+    private final PaymentService paymentService;
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
 //   @CircuitBreaker(name = "identity",fallbackMethod = "fallBackMethod")
@@ -206,4 +209,15 @@ public class ClientController {
             throw new RuntimeException(e);
         }
     }
+    @PostMapping("/client-to-admin")
+    public ResponseEntity<TransferPaymentResponseDto> transferFromClientToAdmin(@RequestParam Long formId) throws AccessDeniedException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        TransferPaymentDto transferPaymentDto = new TransferPaymentDto();
+        transferPaymentDto.setClientId(Long.valueOf((Integer)userId));
+        transferPaymentDto.setAdminId(0);
+        TransferPaymentResponseDto response = paymentService.transferPaymentFromClientToAdmin(transferPaymentDto, formId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransferPaymentDto {
-    private String driverId;
-    private String providerId;
+    private long clientId;
+    private long adminId;
     private BigDecimal amount;
 
 }

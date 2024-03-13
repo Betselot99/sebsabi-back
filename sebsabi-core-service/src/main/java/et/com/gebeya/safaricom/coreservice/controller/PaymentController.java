@@ -17,16 +17,16 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @PostMapping("/client-to-admin")
-    public ResponseEntity<TransferPaymentResponseDto> transferFromClientToAdmin(@RequestBody @Valid TransferPaymentDto transferPaymentDto) {
-        TransferPaymentResponseDto response = paymentService.transferPaymentFromClientToAdmin(transferPaymentDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+//    @PostMapping("/client-to-admin")
+//    public ResponseEntity<TransferPaymentResponseDto> transferFromClientToAdmin(@RequestBody @Valid TransferPaymentDto transferPaymentDto) {
+//        TransferPaymentResponseDto response = paymentService.transferPaymentFromClientToAdmin(transferPaymentDto);
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 
-    @PostMapping("/admin-to-gig-worker")
-    public ResponseEntity<TransferPaymentResponseDto> transferFromAdminToGigWorker(@RequestBody @Valid TransferPaymentDto transferPaymentDto) {
-        TransferPaymentResponseDto response = paymentService.transferPaymentFromAdminToGigWorker(transferPaymentDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+//    @PostMapping("/admin-to-gig-worker")
+//    public ResponseEntity<TransferPaymentResponseDto> transferFromAdminToGigWorker(@RequestBody @Valid TransferPaymentDto transferPaymentDto) {
+//        TransferPaymentResponseDto response = paymentService.transferPaymentFromAdminToGigWorker(transferPaymentDto);
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 }
 
