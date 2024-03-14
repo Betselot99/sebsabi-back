@@ -17,7 +17,5 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     @Query("SELECT c.companyType, COUNT(c) FROM Client c GROUP BY c.companyType")
     List<Object[]> countClientsByCompanyType();
 
-    Page<Client> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrCompanyTypeContainingIgnoreCaseOrEmailContainingIgnoreCase(String firstName, String lastName, String companyType, String email, Pageable pageable);
-
     Page<Client> findAll(Specification<Client> spec, Pageable pageable);
 }

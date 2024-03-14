@@ -1,6 +1,8 @@
 package et.com.gebeya.safaricom.coreservice.controller;
 
 import et.com.gebeya.safaricom.coreservice.Exceptions.FormNotFoundException;
+import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentDto;
+import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentResponseDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.AnswerAnalysisDTO;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
@@ -43,6 +45,8 @@ public class ClientController {
     private final UserResponseService userResponseService;
     private final TestimonialService testimonialService;
     private final AnswerAnalysisService answerAnalysisService;
+    private final AnswerService answerService;
+    private final PaymentService paymentService;
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
 //   @CircuitBreaker(name = "identity",fallbackMethod = "fallBackMethod")
@@ -71,6 +75,13 @@ public class ClientController {
         Object userId = auth.getPrincipal(); // Get user ID
         return clientService.updateClient(Long.valueOf((Integer)userId), clientRequest);
     }
+    @GetMapping("/status/{formId}")
+    public ResponseEntity<Long> getJobStatus(@PathVariable("formId") long formId) throws AccessDeniedException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        Long progress = userResponseService.jobStatusForClient(formId,Long.valueOf((Integer)userId));
+        return new ResponseEntity<>(progress, HttpStatus.OK);
+    }
 
     @GetMapping("/view/form")
     @ResponseStatus(HttpStatus.OK)
@@ -98,6 +109,7 @@ public class ClientController {
         return new ResponseEntity<>(forms, HttpStatus.OK);
     }
 
+    //add form
     @PostMapping("/create/form")
     @ResponseStatus(HttpStatus.CREATED)
     public JobFormDisplaydto createForm(@RequestBody FormDto formDTO )  {
@@ -226,4 +238,23 @@ public class ClientController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Testimonial submitted successfully");
     }
+    @PostMapping("/pay")
+    public ResponseEntity<TransferPaymentResponseDto> transferFromClientToAdmin(@RequestParam Long formId) throws AccessDeniedException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        TransferPaymentDto transferPaymentDto = new TransferPaymentDto();
+        transferPaymentDto.setClientId(Long.valueOf((Integer)userId));
+        transferPaymentDto.setAdminId(0);
+        TransferPaymentResponseDto response = paymentService.transferPaymentFromClientToAdmin(transferPaymentDto, formId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @GetMapping("/check/wallet")
+public ResponseEntity<TransferPaymentResponseDto> checkBalanceForClient(@RequestParam Long clientId){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        TransferPaymentDto transferPaymentDto = new TransferPaymentDto();
+        transferPaymentDto.setClientId((Long) userId);
+        TransferPaymentResponseDto responseDto = paymentService.checkBalanceForClient(String.valueOf(clientId));
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+}
 }

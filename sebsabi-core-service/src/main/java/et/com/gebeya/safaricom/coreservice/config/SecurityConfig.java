@@ -61,6 +61,9 @@ public class SecurityConfig {
                     "api/core/client/view/forms/completed/giveTestimonials",
                     "/api/core/client/view/form/progress/**",
                     "/api/core/client/view/form/update/questions/**",
+                    "/api/core/client/view/form/completed/analyze",
+                    "/api/core/client/pay",
+                    "/api/core/client/check/balance",
                     "api/core/client/view/form/completed/analyze",
                     "api/core/client/view/form/completed/analyze/download"
             };
@@ -125,9 +128,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-
-
-            return new RoleHeaderAuthenticationProvider();
+        return new RoleHeaderAuthenticationProvider();
     }
 
     @Bean
