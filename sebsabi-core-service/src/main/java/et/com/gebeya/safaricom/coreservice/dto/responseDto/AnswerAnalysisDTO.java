@@ -14,4 +14,5 @@ public class AnswerAnalysisDTO {
     private Double trueFalseAverage;
     private Double rangeAverage;
     private Map<Long, String> textAnswersWithResponseId;
+    private byte[] excelReport;
 }

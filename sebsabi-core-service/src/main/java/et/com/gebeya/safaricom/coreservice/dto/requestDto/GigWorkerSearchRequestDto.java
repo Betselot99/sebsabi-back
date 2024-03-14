@@ -15,7 +15,6 @@ public class GigWorkerSearchRequestDto {
     private String lastName;
     private String qualification;
     private String email;
-    private Boolean isActive;
 
 
         public GigWorkerSearchRequestDto(Map<String, String> requestParams) {
@@ -23,6 +22,5 @@ public class GigWorkerSearchRequestDto {
             this.lastName = requestParams.getOrDefault("lastName", "");
             this.qualification = requestParams.getOrDefault("qualification", "");
             this.email = requestParams.getOrDefault("email", "");
-            String isActiveParam = requestParams.getOrDefault("isActive", "");
-            this.isActive = isActiveParam.equalsIgnoreCase("true") || isActiveParam.equalsIgnoreCase("1");        }
+        }
 }

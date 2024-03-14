@@ -5,10 +5,11 @@ import et.com.gebeya.safaricom.coreservice.dto.analysisDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormQuestionDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormSearchRequestDto;
+import et.com.gebeya.safaricom.coreservice.dto.responseDto.FormGigworkerDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
 import et.com.gebeya.safaricom.coreservice.model.*;
 import et.com.gebeya.safaricom.coreservice.model.enums.QuestionType;
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserResponseRequestDto;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.repository.specification.FormSpecifications;
 import jakarta.transaction.Transactional;
@@ -17,15 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -98,13 +96,17 @@ public class FormService {
         return formRepository.findFormsByStatus(status);
     }
 
-    public List<Form> getFormsByStatusClamied(Long gigWorkerId,Status status) {
-        return formRepository.findFormsByAssignedGigWorkerIdAndStatus(gigWorkerId,Status.Claimed);
-    }
+//    public List<Form> getFormsByStatusClamied(Long gigWorkerId,Status status) {
+//        return formRepository.findFormsByAssignedGigWorkerIdAndStatus(gigWorkerId,Status.Claimed);
+//    }
+//
 
 
     public List<Form> getFormsByClientIdAndStatus(Long client_id, Status status) {
         return formRepository.findFormsByClient_IdAndStatus(client_id, status);
+    }
+    public List<Form> getFormsByGigWorkerIdAndStatus(Long gig_worker_id, Status status) {
+        return formRepository.findFormsByAssignedGigWorkerIdAndStatus(gig_worker_id, status);
     }
 
 
@@ -160,6 +162,9 @@ public class FormService {
 
     public Form getFormForGigWorker(Long formId, Long gig_worker_id) throws AccessDeniedException {
         return formRepository.findFormByIdAndAssignedGigWorkerId(formId, gig_worker_id).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
+    }
+    public Form getFormForGigWorkerAndClient(Long form_id,Long client_id, Long gig_worker_id) throws AccessDeniedException {
+        return formRepository.findFormsByIdAndClient_IdAndAssignedGigWorkerId(form_id,client_id, gig_worker_id);
     }
     public Form getFormForClientByFormId(Long formId, Long clientId) throws AccessDeniedException {
         return formRepository.findFormByIdAndClient_Id(formId, clientId).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));

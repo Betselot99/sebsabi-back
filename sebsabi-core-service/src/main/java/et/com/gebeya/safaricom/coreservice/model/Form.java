@@ -1,6 +1,7 @@
 package et.com.gebeya.safaricom.coreservice.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormDto;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import lombok.*;
 
 import jakarta.persistence.*;

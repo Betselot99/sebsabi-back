@@ -21,7 +21,5 @@ public class ClientSpecifications {
     public static Specification<Client> clientByEmail(String email) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + email.toLowerCase() + "%");
     }
-    public static Specification<Client> clientByIsActive(boolean isActive) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("isActive"), isActive);
-    }
+
 }

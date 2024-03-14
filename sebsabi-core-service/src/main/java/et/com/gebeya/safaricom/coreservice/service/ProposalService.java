@@ -6,7 +6,7 @@ import et.com.gebeya.safaricom.coreservice.dto.responseDto.FormGigworkerDto;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.GigWorker;
 import et.com.gebeya.safaricom.coreservice.model.Proposal;
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.repository.ProposalRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,6 +77,10 @@ public class ProposalService {
                 .distinct() // Optional: If you want unique forms only
                 .collect(Collectors.toList());
     }
+    public Proposal findProposalByFormIdAndGigWorkerId(Long formId,Long gigWorkerId) {
+        return proposalRepository.findProposalByFormIdAndGigWorkerId(formId,gigWorkerId);
+    }
+
 
 
 }

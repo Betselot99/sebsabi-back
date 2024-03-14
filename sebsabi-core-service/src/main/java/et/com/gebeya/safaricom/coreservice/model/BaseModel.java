@@ -1,5 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.model;
 
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

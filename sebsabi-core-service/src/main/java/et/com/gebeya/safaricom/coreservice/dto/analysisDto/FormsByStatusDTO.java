@@ -1,6 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.dto.analysisDto;
 
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import lombok.*;
 
 @Builder

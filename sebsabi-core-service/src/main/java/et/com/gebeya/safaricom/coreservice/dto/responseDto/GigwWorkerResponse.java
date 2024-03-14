@@ -1,13 +1,15 @@
 package et.com.gebeya.safaricom.coreservice.dto.responseDto;
 
 import et.com.gebeya.safaricom.coreservice.model.GigWorker;
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.Testimonial;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -23,6 +25,7 @@ public class GigwWorkerResponse {
     private int age;
     private String password;
     private Status isActive;
+    private List<Testimonial> testimonials;
 
     public GigwWorkerResponse(GigWorker gigWorker){
       //  this.id=gigWorker.getId();
@@ -32,6 +35,8 @@ public class GigwWorkerResponse {
         this.password= gigWorker.getPassword();
         this.email=gigWorker.getEmail();
         this.dob=gigWorker.getDob();
+        this.isActive=gigWorker.getIsActive();
+
         this.age=gigWorker.getAge();
     }
 }

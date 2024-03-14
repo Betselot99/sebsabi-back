@@ -1,5 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,10 +22,12 @@ public class Testimonial {
 
     @ManyToOne
     @JoinColumn(name = "client_id")
+    @JsonIgnore
     private Client client;
 
     @ManyToOne
     @JoinColumn(name = "gig_worker_id")
+    @JsonIgnore
     private GigWorker gigWorker;
 
     // Constructors, getters, and setters

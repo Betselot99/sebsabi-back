@@ -1,8 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.dto.responseDto;
 
-import et.com.gebeya.safaricom.coreservice.model.Status;
 import et.com.gebeya.safaricom.coreservice.model.enums.Authority;
-import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

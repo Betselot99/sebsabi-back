@@ -26,11 +26,12 @@ public class GigWorker extends Person{
     @Valid
     private Form assignedForm;
     // One-to-many relationship with Testimonials
-    @OneToMany(mappedBy = "gigWorker")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "gigWorker")
     private List<Testimonial> testimonials;
 
+
     // One-to-many relationship with Ratings
-    @OneToMany(mappedBy = "gigWorker")
+    @OneToMany
     private List<Rating> ratings;
     public GigWorker(GigWorkerRequest gigWorkerRequest){
         this.setFirstName(gigWorkerRequest.getFirstName());

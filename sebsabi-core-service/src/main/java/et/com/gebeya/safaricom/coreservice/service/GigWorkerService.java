@@ -3,21 +3,18 @@ package et.com.gebeya.safaricom.coreservice.service;
 
 import et.com.gebeya.safaricom.coreservice.Exceptions.FormNotFoundException;
 import et.com.gebeya.safaricom.coreservice.Exceptions.GigWorkerNotFoundException;
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserRequestDto;
 import et.com.gebeya.safaricom.coreservice.event.ClientCreatedEvent;
-import et.com.gebeya.safaricom.coreservice.model.Client;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.GigWorker;
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.model.enums.Authority;
 import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.repository.GigWorkerRepository;
 
-import et.com.gebeya.safaricom.coreservice.repository.specification.ClientSpecifications;
 import et.com.gebeya.safaricom.coreservice.repository.specification.GigworkerSpecifications;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -206,7 +203,6 @@ public class GigWorkerService {
         String lastName = searchRequestDto.getLastName();
         String qualification = searchRequestDto.getQualification();
         String email = searchRequestDto.getEmail();
-        Boolean isActive = searchRequestDto.getIsActive();
 
 
         Specification<GigWorker> spec = Specification.where(null);
@@ -227,10 +223,7 @@ public class GigWorkerService {
             spec = spec.and(GigworkerSpecifications.gigWorkerByEmail(email));
         }
         // Adding isActive criteria
-        if (isActive != null) {
-            boolean isActiveValue = isActive;
-            spec = spec.and(GigworkerSpecifications.gigWorkerByIsActive(isActiveValue));
-        }
+
 
 
         return gigWorkerRepository.findAll(spec, pageable);

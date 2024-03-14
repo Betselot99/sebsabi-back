@@ -58,8 +58,11 @@ public class SecurityConfig {
                     "/api/core/client/view/form/update",
                     "/api/core/client/search/form",
                     "/api/core/client/view/form/status/**",
+                    "api/core/client/view/forms/completed/giveTestimonials",
+                    "/api/core/client/view/form/progress/**",
                     "/api/core/client/view/form/update/questions/**",
-                    "api/core/client/view/form/completed/analyze"
+                    "api/core/client/view/form/completed/analyze",
+                    "api/core/client/view/form/completed/analyze/download"
             };
     public static final String[] GIGWORKER_MATCHERS =
             {
@@ -122,7 +125,9 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        return new RoleHeaderAuthenticationProvider();
+
+
+            return new RoleHeaderAuthenticationProvider();
     }
 
     @Bean

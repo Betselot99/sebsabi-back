@@ -1,7 +1,7 @@
 package et.com.gebeya.safaricom.coreservice.dto.responseDto;
 
 import et.com.gebeya.safaricom.coreservice.model.Client;
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,5 +31,6 @@ public class ClientResponse {
         this.email=client.getEmail();
         this.companyType=client.getCompanyType();
         this.occupation=client.getOccupation();
+        this.isActive=client.getIsActive();
     }
 }

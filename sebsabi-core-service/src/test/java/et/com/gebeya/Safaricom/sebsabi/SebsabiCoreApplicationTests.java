@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import et.com.gebeya.safaricom.coreservice.SebsabiCoreApplication;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.service.FormService;
 import org.junit.jupiter.api.Test;

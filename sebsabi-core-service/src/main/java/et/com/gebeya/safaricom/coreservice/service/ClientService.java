@@ -1,26 +1,22 @@
 package et.com.gebeya.safaricom.coreservice.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserRequestDto;
 import et.com.gebeya.safaricom.coreservice.event.ClientCreatedEvent;
 import et.com.gebeya.safaricom.coreservice.model.Client;
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.model.enums.Authority;
 import et.com.gebeya.safaricom.coreservice.repository.ClientRepository;
 import et.com.gebeya.safaricom.coreservice.repository.specification.ClientSpecifications;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.core.MediaType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -202,7 +198,6 @@ public class ClientService {
         String lastName = searchRequestDto.getLastName();
         String companyType = searchRequestDto.getCompanyType();
         String email = searchRequestDto.getEmail();
-        Boolean isActive = searchRequestDto.getIsActive();
 
 
         Specification<Client> spec = Specification.where(null);
@@ -223,10 +218,7 @@ public class ClientService {
             spec = spec.and(ClientSpecifications.clientByEmail(email));
         }
         // Adding isActive criteria
-        if (isActive != null) {
-            boolean isActiveValue = isActive;
-            spec = spec.and(ClientSpecifications.clientByIsActive(isActiveValue));
-        }
+
 
 
         return clientRepository.findAll(spec, pageable);

@@ -1,6 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.dto.requestDto;
 
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import lombok.*;
 
 import java.util.List;

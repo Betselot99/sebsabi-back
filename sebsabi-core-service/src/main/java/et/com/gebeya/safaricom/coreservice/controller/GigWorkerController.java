@@ -7,7 +7,8 @@ import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserResponseRequestDto
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.FormGigworkerDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.model.Form;
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.GigWorker;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.model.UserResponse;
 import et.com.gebeya.safaricom.coreservice.service.FormService;
 import et.com.gebeya.safaricom.coreservice.service.GigWorkerService;
@@ -47,10 +48,10 @@ public class GigWorkerController {
 
     @GetMapping("/view/profile")
     @ResponseStatus(HttpStatus.OK)
-    public GigwWorkerResponse getGigworkerById(){
+    public GigWorker getGigworkerById(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal(); // Get user ID
-        return gigWorkerService.getGigWorkerById(Long.valueOf((Integer)userId));
+        return gigWorkerService.getGigWorkerByIdg(Long.valueOf((Integer)userId));
     }
     @PutMapping("/view/profile/update")
     @ResponseStatus(HttpStatus.OK)
@@ -68,18 +69,26 @@ public class GigWorkerController {
     @GetMapping("/view/forms/claimed")
     @ResponseStatus(HttpStatus.OK)
     public List<Form> getAllFormByClaimed() {
-        Status status = Status.Claimed; // Set the status to "CLaimed"
+        Status status = Status.Claimed; // Set the status to "Claimed"
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
-        return formService.getFormsByStatusClamied(Long.valueOf((Integer)userId),status);
+        return formService.getFormsByGigWorkerIdAndStatus(Long.valueOf((Integer)userId),status);
     }
     @GetMapping("/view/forms/applied")
     @ResponseStatus(HttpStatus.OK)
-    public List<FormGigworkerDto> getAllFormByApplied() {
+    public List<Form> getAllFormByApplied() {
         Status status = Status.Claimed; // Set the status to "Applied"
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
-        return proposalService.findFormsByGigWorkerId(Long.valueOf((Integer)userId));
+        return formService.getFormsByGigWorkerIdAndStatus(Long.valueOf((Integer)userId),status);
+    }
+    @GetMapping("/view/forms/completed")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Form> getAllFormByCompleted() {
+        Status status = Status.Completed; // Set the status to "Completed"
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        return formService.getFormsByGigWorkerIdAndStatus(Long.valueOf((Integer)userId),status);
     }
     @PostMapping("/view/forms/proposal/submit")
     public ResponseEntity<String> submitProposal(@RequestParam Long form_id ,@RequestBody ProposalDto proposalDto) {

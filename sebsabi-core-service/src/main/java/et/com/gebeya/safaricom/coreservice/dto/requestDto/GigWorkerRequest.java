@@ -1,7 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.dto.requestDto;
 
-import et.com.gebeya.safaricom.coreservice.model.GigWorker;
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

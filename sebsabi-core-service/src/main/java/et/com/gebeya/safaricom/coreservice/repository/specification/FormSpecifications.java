@@ -1,13 +1,10 @@
 package et.com.gebeya.safaricom.coreservice.repository.specification;
 
 import et.com.gebeya.safaricom.coreservice.model.Form;
-import et.com.gebeya.safaricom.coreservice.model.Status;
 import org.springframework.data.jpa.domain.Specification;
-import jakarta.persistence.criteria.Predicate;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+
 public class FormSpecifications {
 
 
