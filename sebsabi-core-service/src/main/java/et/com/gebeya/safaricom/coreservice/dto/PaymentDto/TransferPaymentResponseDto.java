@@ -16,4 +16,5 @@ public class TransferPaymentResponseDto {
     private long gigWorkerId;
     private String message;
     private long clientId;
+    private long transactionNumber;
 }

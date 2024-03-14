@@ -17,9 +17,12 @@ import java.math.BigDecimal;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
+    private final Payment payment;
     private final PaymentRepository paymentRepository;
     private final FormService formService;
     private final ProposalService proposalService;
@@ -28,6 +31,8 @@ public class PaymentService {
     @Transactional
     public TransferPaymentResponseDto transferPaymentFromClientToAdmin(TransferPaymentDto transferPaymentDto, Long formId) throws AccessDeniedException {
         Form form = formService.getFormForClientByFormId(formId, transferPaymentDto.getClientId());
+        String transactionNumber = generateTransactionNumber();
+        payment.setTransactionNumber(Long.valueOf(transactionNumber));
         if (form != null) {
             // Retrieve sender and receiver wallets
             Wallet clientWallet = getUserWallet(String.valueOf(transferPaymentDto.getClientId()));
@@ -54,19 +59,25 @@ public class PaymentService {
             responseDto.setAmountTransferred(amountAfterCommission);
             responseDto.setAdminCommission(adminCommission);
             responseDto.setMessage("Payment transferred successfully from client to admin.");
+            responseDto.setTransactionNumber(Long.parseLong(transactionNumber));
+            Payment payment = new Payment(responseDto);
+            paymentRepository.save(payment);
+            formRepository.save(form);
+            transferPaymentFromAdminToGigWorker(transferPaymentDto, formId);
             return responseDto;
         }
         throw new RuntimeException("Form Not Found");
     }
 
     @Transactional
-    public TransferPaymentResponseDto transferPaymentFromAdminToGigWorker(TransferPaymentDto transferPaymentDto, Long formId) {
+    public TransferPaymentResponseDto transferPaymentFromAdminToGigWorker(TransferPaymentDto transferPaymentDto, Long formId) throws AccessDeniedException {
         Form form = formService.getFormById(formId);
+        Form form2 = formService.getFormForClientByFormId(formId, transferPaymentDto.getClientId());
+
         if (form != null) {
             // Retrieve sender and receiver wallets
             Wallet adminWallet = getUserWallet(String.valueOf(transferPaymentDto.getAdminId()));
             Wallet gigWorkerWallet = getUserWallet(String.valueOf(form.getAssignedGigWorker().getId()));
-
             // Perform transaction
             BigDecimal amountToTransfer = transferPaymentDto.getAmount();
             if (adminWallet.getAmount().compareTo(amountToTransfer) < 0) {
@@ -125,6 +136,9 @@ public class PaymentService {
         Payment user = getUser(id);
         paymentRepository.delete(user);
         return Map.of("message", "User Payment Account Deleted Successfully");
+    }
+    private String generateTransactionNumber() {
+        return UUID.randomUUID().toString();
     }
 //    @Transactional
 //    public TransferPaymentResponseDto transferPaymentFromClientToAdmin(TransferPaymentDto transferPaymentDto, Long formId) throws AccessDeniedException {

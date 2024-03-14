@@ -35,6 +35,8 @@ public class Payment {
     private Long transactionNumber;
 //payment status, transaction Number, Paid amount
     public Payment(TransferPaymentResponseDto paymentDto){
+
         this.setAmount(paymentDto.getAmountTransferred());
+        this.setTransactionNumber(transactionNumber);
     }
 }
