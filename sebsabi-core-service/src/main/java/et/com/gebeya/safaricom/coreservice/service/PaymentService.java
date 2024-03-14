@@ -72,7 +72,7 @@ public class PaymentService {
     @Transactional
     public TransferPaymentResponseDto transferPaymentFromAdminToGigWorker(TransferPaymentDto transferPaymentDto, Long formId) throws AccessDeniedException {
         Form form = formService.getFormById(formId);
-        Form form2 = formService.getFormForClientByFormId(formId, transferPaymentDto.getClientId());
+        //Form form2 = formService.getFormForClientByFormId(formId, transferPaymentDto.getClientId());
 
         if (form != null) {
             // Retrieve sender and receiver wallets

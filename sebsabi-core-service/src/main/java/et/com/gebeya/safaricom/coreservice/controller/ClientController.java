@@ -209,7 +209,7 @@ public class ClientController {
             throw new RuntimeException(e);
         }
     }
-    @PostMapping("/client-to-admin")
+    @PostMapping("/pay")
     public ResponseEntity<TransferPaymentResponseDto> transferFromClientToAdmin(@RequestParam Long formId) throws AccessDeniedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
@@ -219,7 +219,7 @@ public class ClientController {
         TransferPaymentResponseDto response = paymentService.transferPaymentFromClientToAdmin(transferPaymentDto, formId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    @GetMapping("/balance-for-client")
+    @GetMapping("/check/wallet")
 public ResponseEntity<TransferPaymentResponseDto> checkBalanceForClient(@RequestParam Long clientId){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();

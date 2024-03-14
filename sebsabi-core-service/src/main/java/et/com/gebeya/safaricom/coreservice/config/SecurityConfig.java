@@ -59,7 +59,9 @@ public class SecurityConfig {
                     "/api/core/client/search/form",
                     "/api/core/client/view/form/status/**",
                     "/api/core/client/view/form/update/questions/**",
-                    "api/core/client/view/form/completed/analyze"
+                    "/api/core/client/view/form/completed/analyze",
+                    "/api/core/client/pay",
+                    "/api/core/client/check/balance"
             };
     public static final String[] GIGWORKER_MATCHERS =
             {

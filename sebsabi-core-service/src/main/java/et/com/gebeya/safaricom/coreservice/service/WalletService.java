@@ -31,7 +31,7 @@ public class WalletService {
 
     private Long getUserIdFromSecurityContext() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Object userId = auth.getPrincipal();// Adjust this line based on your UserDetails implementation
+        Object userId = auth.getPrincipal();
 
         return (Long) userId;
     }
