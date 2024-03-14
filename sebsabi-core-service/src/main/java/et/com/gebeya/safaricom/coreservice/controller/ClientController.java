@@ -219,5 +219,13 @@ public class ClientController {
         TransferPaymentResponseDto response = paymentService.transferPaymentFromClientToAdmin(transferPaymentDto, formId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
+    @GetMapping("/balance-for-client")
+public ResponseEntity<TransferPaymentResponseDto> checkBalanceForClient(@RequestParam Long clientId){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        TransferPaymentDto transferPaymentDto = new TransferPaymentDto();
+        transferPaymentDto.setClientId((Long) userId);
+        TransferPaymentResponseDto responseDto = paymentService.checkBalanceForClient(String.valueOf(clientId));
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+}
 }
