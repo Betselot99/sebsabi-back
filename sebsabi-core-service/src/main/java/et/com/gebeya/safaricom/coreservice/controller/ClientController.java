@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +45,8 @@ public class ClientController {
     private final FormQuestionService formQuestionService;
     private final UserResponseService userResponseService;
     private final TestimonialService testimonialService;
-    private final AnswerAnalysisService answerAnalysisService;
-    private final AnswerService answerService;
+    private final AnswerService answerAnalysisService;
+    private final WalletService walletService;
     private final PaymentService paymentService;
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -198,30 +199,30 @@ public class ClientController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    @GetMapping(value = "/view/form/completed/analyze/download", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ByteArrayResource> analyzeAnswersExcelDownload(@RequestParam Long formId) {
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Object userId = auth.getPrincipal();
-            AnswerAnalysisDTO analysisDTO = answerAnalysisService.analyzeAnswers(formId, Long.valueOf((Integer)userId));
-            byte[] excelReport = analysisDTO.getExcelReport();
-
-            // Set the content type and disposition of the response
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("filename", "analysis_report.xlsx");
-
-            // Return the Excel file as a byte array resource
-            ByteArrayResource resource = new ByteArrayResource(excelReport);
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(resource);
-        } catch (IOException e) {
-            // Handle IOException
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
+//    @GetMapping(value = "/view/form/completed/analyze/download", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<ByteArrayResource> analyzeAnswersExcelDownload(@RequestParam Long formId) {
+//        try {
+//            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//            Object userId = auth.getPrincipal();
+//            AnswerAnalysisDTO analysisDTO = answerAnalysisService.analyzeAnswers(formId, Long.valueOf((Integer)userId));
+//            byte[] excelReport = analysisDTO.getExcelReport();
+//
+//            // Set the content type and disposition of the response
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//            headers.setContentDispositionFormData("filename", "analysis_report.xlsx");
+//
+//            // Return the Excel file as a byte array resource
+//            ByteArrayResource resource = new ByteArrayResource(excelReport);
+//            return ResponseEntity.ok()
+//                    .headers(headers)
+//                    .body(resource);
+//        } catch (IOException e) {
+//            // Handle IOException
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
     @PostMapping("/view/forms/completed/giveTestimonials")
     @ResponseStatus(HttpStatus.CREATED)
@@ -238,23 +239,45 @@ public class ClientController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Testimonial submitted successfully");
     }
+    @GetMapping("/check/invoice")
+    public ResponseEntity<PaymentInvoiceDto> getPaymentInvoice(@RequestParam Long formId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        try {
+            TransferPaymentDto transferPaymentDto = new TransferPaymentDto();
+            transferPaymentDto.setClientId(Long.valueOf((Integer)userId));
+            //transferPaymentDto.setAdminId(0);
+            PaymentInvoiceDto invoiceDto = paymentService.getPaymentInvoice(transferPaymentDto,formId);
+            return new ResponseEntity<>(invoiceDto, HttpStatus.OK);
+        } catch (AccessDeniedException e) {
+            // Handle access denied exception
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
     @PostMapping("/pay")
     public ResponseEntity<TransferPaymentResponseDto> transferFromClientToAdmin(@RequestParam Long formId) throws AccessDeniedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
         TransferPaymentDto transferPaymentDto = new TransferPaymentDto();
-        transferPaymentDto.setClientId(Long.valueOf((Integer)userId));
+        transferPaymentDto.setClientId(Long.valueOf((Integer) userId));
         transferPaymentDto.setAdminId(0);
         TransferPaymentResponseDto response = paymentService.transferPaymentFromClientToAdmin(transferPaymentDto, formId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping("/check/wallet")
-public ResponseEntity<TransferPaymentResponseDto> checkBalanceForClient(@RequestParam Long clientId){
+    public ResponseEntity<TransferPaymentResponseDto> checkBalanceForClient(){
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Object userId = auth.getPrincipal();
+            TransferPaymentDto transferPaymentDto = new TransferPaymentDto();
+            transferPaymentDto.setClientId(Long.valueOf((Integer) userId));
+            TransferPaymentResponseDto responseDto = paymentService.checkBalanceForClient(Long.valueOf((Integer)userId));
+            return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+    @PostMapping("/check/wallet/add-money")
+    public ResponseEntity<Wallet> addMoneyToWallet(@RequestParam BigDecimal amount) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
-        TransferPaymentDto transferPaymentDto = new TransferPaymentDto();
-        transferPaymentDto.setClientId((Long) userId);
-        TransferPaymentResponseDto responseDto = paymentService.checkBalanceForClient(String.valueOf(clientId));
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
-}
+        Wallet wallet = walletService.addMoneyToWallet(Long.valueOf((Integer)userId),amount);
+        return new ResponseEntity<>(wallet, HttpStatus.OK);
+    }
 }

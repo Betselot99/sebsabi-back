@@ -1,9 +1,12 @@
 package et.com.gebeya.safaricom.coreservice.service;
 
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.AnswerAnalysisDTO;
+import et.com.gebeya.safaricom.coreservice.dto.responseDto.MultipleChoiceOptionDTO;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.OptionSelectionCountDTO;
+import et.com.gebeya.safaricom.coreservice.dto.responseDto.QuestionAnalysisDTO;
 import et.com.gebeya.safaricom.coreservice.model.Answer;
 import et.com.gebeya.safaricom.coreservice.model.Form;
+import et.com.gebeya.safaricom.coreservice.model.FormQuestion;
 import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.model.enums.QuestionType;
 import et.com.gebeya.safaricom.coreservice.repository.AnswerRepository;
@@ -15,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-
+import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class AnswerService {
@@ -26,85 +29,96 @@ public class AnswerService {
         return answerRepository.save(answer);
     }
 
-    public AnswerAnalysisDTO analyzeAnswers(Long formId ,Long client_id) throws AccessDeniedException {
-        Form form = formService.getFormForClientByFormId(formId,client_id);
+    public AnswerAnalysisDTO analyzeAnswers(Long formId, Long clientId) throws AccessDeniedException {
+        Form form = formService.getFormForClientByFormId(formId, clientId);
         List<Answer> answers = answerRepository.findByUserResponse_Form_Id(formId);
 
         if (form.getStatus() != Status.Completed) {
             throw new RuntimeException("Form is not completed yet");
         }
 
-        Map<String, Long> optionSelectionCount = new HashMap<>();
-        long trueCount = 0;
-        long falseCount = 0;
-        AtomicLong rangeTotalSum = new AtomicLong(0); // Use AtomicLong to support concurrent updates
-        AtomicLong rangeQuestionCount = new AtomicLong(0); // Use AtomicLong to support concurrent updates
-        Map<Long, String> textAnswersWithResponseId = new HashMap<>();
+        List<QuestionAnalysisDTO> questionAnalysis = form.getQuestions().stream()
+                .map(question -> {
+                    QuestionAnalysisDTO analysis = new QuestionAnalysisDTO();
+                    analysis.setId(question.getId());
+                    analysis.setQuestionText(question.getQuestionText());
+                    analysis.setQuestionType(question.getQuestionType().toString());
+                    analysis.setMultipleChoiceOptions(question.getMultipleChoiceOptions().stream()
+                            .map(option -> new MultipleChoiceOptionDTO(option.getId(), option.getOptionText()))
+                            .collect(Collectors.toList()));
+                    analysis.setRatingScale(question.getRatingScale());
 
-        for (Answer answer : answers) {
-            if (answer.getQuestion().getQuestionType().equals(QuestionType.MULTIPLE_CHOICE)) {
-                countOptionSelections(answer, optionSelectionCount);
-            } else if (answer.getQuestion().getQuestionType().equals(QuestionType.TRUE_FALSE)) {
-                calculateTrueFalse(answer, trueCount, falseCount);
-            } else if (answer.getQuestion().getQuestionType().equals(QuestionType.RATING_SCALE)) {
-                calculateRange(answer, rangeTotalSum, rangeQuestionCount);
-            } else if (answer.getQuestion().getQuestionType().equals(QuestionType.TEXT)) {
-                textAnswersWithResponseId.put(answer.getUserResponse().getId(), answer.getAnswerText());
-            }
-        }
+                    switch (question.getQuestionType()) {
+                        case TRUE_FALSE:
+                            analyzeTrueFalseAnswers(question, answers, analysis);
+                            break;
+                        case MULTIPLE_CHOICE:
+                            analyzeMultipleChoiceAnswers(question, answers, analysis);
+                            break;
+                        case RATING_SCALE:
+                            analyzeRatingScaleAnswers(question, answers, analysis);
+                            break;
+                        case TEXT:
+                            analyzeTextAnswers(question, answers, analysis);
+                            break;
+                        default:
+                            break;
+                    }
 
-        double trueFalseAverage = calculateTrueFalseAverage(trueCount, falseCount, answers.size());
-        double rangeAverage = calculateRangeAverage(rangeTotalSum.get(), rangeQuestionCount.get());
+                    return analysis;
+                })
+                .collect(Collectors.toList());
 
         AnswerAnalysisDTO analysisDTO = new AnswerAnalysisDTO();
-        analysisDTO.setOptionSelectionCount(mapOptionSelectionCountToDTO(optionSelectionCount));
-        analysisDTO.setTrueFalseAverage(trueFalseAverage);
-        analysisDTO.setRangeAverage(rangeAverage);
-        analysisDTO.setTextAnswersWithResponseId(textAnswersWithResponseId);
+        analysisDTO.setQuestionAnalysis(questionAnalysis);
 
         return analysisDTO;
     }
 
-    private void countOptionSelections(Answer answer, Map<String, Long> optionSelectionCount) {
-        answer.getSelectedOptions().forEach(option -> {
-            String optionId = String.valueOf(option.getId());
-            optionSelectionCount.put(optionId, optionSelectionCount.getOrDefault(optionId, 0L) + 1);
-        });
+    private void analyzeTrueFalseAnswers(FormQuestion question, List<Answer> answers, QuestionAnalysisDTO analysis) {
+        Long trueCount = answers.stream()
+                .filter(answer -> answer.getQuestion().equals(question) && answer.getAnswerText() != null && answer.getAnswerText().equalsIgnoreCase("true"))
+                .count();
+        Long falseCount = answers.stream()
+                .filter(answer -> answer.getQuestion().equals(question) && answer.getAnswerText() != null && answer.getAnswerText().equalsIgnoreCase("false"))
+                .count();
+        analysis.setTrueCount(trueCount);
+        analysis.setFalseCount(falseCount);
     }
 
-    private void calculateTrueFalse(Answer answer, long trueCount, long falseCount) {
-        String answerText = answer.getAnswerText();
-        if (answerText != null) {
-            if (answerText.equalsIgnoreCase("true")) {
-                trueCount++;
-            } else if (answerText.equalsIgnoreCase("false")) {
-                falseCount++;
-            }
+    private void analyzeMultipleChoiceAnswers(FormQuestion question, List<Answer> answers, QuestionAnalysisDTO analysis) {
+        Map<String, Long> optionSelectionCount = new HashMap<>();
+        answers.stream()
+                .filter(answer -> answer.getQuestion().equals(question) && answer.getSelectedOptions() != null)
+                .flatMap(answer -> answer.getSelectedOptions().stream())
+                .forEach(option -> {
+                    String optionId = String.valueOf(option.getId());
+                    optionSelectionCount.put(optionId, optionSelectionCount.getOrDefault(optionId, 0L) + 1);
+                });
+        analysis.setOptionSelectionCount(optionSelectionCount);
+    }
+
+    private void analyzeRatingScaleAnswers(FormQuestion question, List<Answer> answers, QuestionAnalysisDTO analysis) {
+        List<Integer> ratings = answers.stream()
+                .filter(answer -> answer.getQuestion().equals(question) && answer.getRating() != null)
+                .map(Answer::getRating)
+                .collect(Collectors.toList());
+        if (!ratings.isEmpty()) {
+            double averageRating = ratings.stream()
+                    .mapToInt(Integer::intValue)
+                    .average()
+                    .orElse(0);
+            analysis.setAverageRating(averageRating);
         }
     }
 
-    private void calculateRange(Answer answer, AtomicLong rangeTotalSum, AtomicLong rangeQuestionCount) {
-        Integer rating = answer.getRating();
-        if (rating != null) {
-            rangeTotalSum.addAndGet(rating);
-            rangeQuestionCount.incrementAndGet();
-        }
-    }
-
-
-
-    private double calculateTrueFalseAverage(long trueCount, long falseCount, int totalAnswers) {
-        long totalCount = trueCount + falseCount;
-        return totalCount == 0 ? 0 : (double) totalCount / totalAnswers;
-    }
-
-    private double calculateRangeAverage(long rangeTotalSum, long rangeQuestionCount) {
-        return rangeQuestionCount == 0 ? 0 : (double) rangeTotalSum / rangeQuestionCount;
-    }
-
-    private Map<String, OptionSelectionCountDTO> mapOptionSelectionCountToDTO(Map<String, Long> optionSelectionCount) {
-        Map<String, OptionSelectionCountDTO> optionSelectionCountDTO = new HashMap<>();
-        optionSelectionCount.forEach((key, value) -> optionSelectionCountDTO.put(key, new OptionSelectionCountDTO(key, value)));
-        return optionSelectionCountDTO;
+    private void analyzeTextAnswers(FormQuestion question, List<Answer> answers, QuestionAnalysisDTO analysis) {
+        Map<Long, String> textAnswersWithResponseId = answers.stream()
+                .filter(answer -> answer.getQuestion().equals(question) && answer.getAnswerText() != null)
+                .collect(Collectors.toMap(
+                        answer -> answer.getUserResponse().getId(),
+                        Answer::getAnswerText
+                ));
+        analysis.setTextAnswersWithResponseId(textAnswersWithResponseId);
     }
 }

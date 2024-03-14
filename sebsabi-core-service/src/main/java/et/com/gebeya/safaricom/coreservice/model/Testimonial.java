@@ -1,6 +1,7 @@
 package et.com.gebeya.safaricom.coreservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +23,7 @@ public class Testimonial {
 
     @ManyToOne
     @JoinColumn(name = "client_id")
-    @JsonIgnore
+    @JsonIgnoreProperties(value = {"id", "email", "password", "profileImage", "createdAt", "updatedAt", "isActive", "companyName", "companyType", "occupation", "forms", "testimonials", "ratings"})
     private Client client;
 
     @ManyToOne

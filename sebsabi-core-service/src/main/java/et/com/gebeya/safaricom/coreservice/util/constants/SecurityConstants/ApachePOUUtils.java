@@ -19,24 +19,24 @@ import java.util.Map;
 public class ApachePOUUtils {
 
 
-    public byte[] generateExcelReport(AnswerAnalysisDTO analysisDTO) throws IOException {
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Analysis Report");
-            int rowNum = 0;
-            Row headerRow = sheet.createRow(rowNum++);
-            headerRow.createCell(0).setCellValue("Question");
-            headerRow.createCell(1).setCellValue("Option");
-            headerRow.createCell(2).setCellValue("Count");
-
-            for (Map.Entry<String, OptionSelectionCountDTO> entry : analysisDTO.getOptionSelectionCount().entrySet()) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(entry.getValue().getOptionId());
-                row.createCell(1).setCellValue(entry.getValue().getCount());
-            }
-
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            workbook.write(bos);
-            return bos.toByteArray();
-        }
-    }
+//    public byte[] generateExcelReport(AnswerAnalysisDTO analysisDTO) throws IOException {
+//        try (Workbook workbook = new XSSFWorkbook()) {
+//            Sheet sheet = workbook.createSheet("Analysis Report");
+//            int rowNum = 0;
+//            Row headerRow = sheet.createRow(rowNum++);
+//            headerRow.createCell(0).setCellValue("Question");
+//            headerRow.createCell(1).setCellValue("Option");
+//            headerRow.createCell(2).setCellValue("Count");
+//
+//            for (Map.Entry<String, OptionSelectionCountDTO> entry : analysisDTO.getOptionSelectionCount().entrySet()) {
+//                Row row = sheet.createRow(rowNum++);
+//                row.createCell(0).setCellValue(entry.getValue().getOptionId());
+//                row.createCell(1).setCellValue(entry.getValue().getCount());
+//            }
+//
+//            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//            workbook.write(bos);
+//            return bos.toByteArray();
+//        }
+//    }
 }

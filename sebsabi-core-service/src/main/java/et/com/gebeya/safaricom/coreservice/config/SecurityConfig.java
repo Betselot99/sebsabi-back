@@ -38,7 +38,8 @@ public class SecurityConfig {
                     "/v3/api-docs/**",
                     "/api/core/client/signup",
                     "/api/core/gig-worker/signup",
-                    "/api/core/calculate"
+                    "/api/core/calculate",
+                    "/api/wallet/add-money"
 
             };
     public static final String[] ADMIN_MATCHERS = {
@@ -63,9 +64,11 @@ public class SecurityConfig {
                     "/api/core/client/view/form/update/questions/**",
                     "/api/core/client/view/form/completed/analyze",
                     "/api/core/client/pay",
-                    "/api/core/client/check/balance",
-                    "api/core/client/view/form/completed/analyze",
-                    "api/core/client/view/form/completed/analyze/download"
+                    "/api/core/client/check/wallet",
+                    "/api/core/client/check/invoice",
+                    "/api/core/client/check/wallet/add-money",
+                    "/api/core/client/view/form/completed/analyze",
+                    "/api/core/client/view/form/completed/analyze/download"
             };
     public static final String[] GIGWORKER_MATCHERS =
             {
@@ -74,7 +77,10 @@ public class SecurityConfig {
                     "/api/core/gig-worker/view/forms/**",
                     "/api/core/gig-worker/view/forms/proposal/submit",
                     "/api/core/gig-worker/view/forms/formQuestion/submit-response",
-                    "/api/core/gig-worker/view/form/**"
+                    "/api/core/gig-worker/view/form/**",
+                    "/api/core/gig-worker/check/balance",
+                    "/api/core/gig-worker/check/wallet",
+                    "/api/core/gig-worker/check/wallet/add-money",
 
             };
 

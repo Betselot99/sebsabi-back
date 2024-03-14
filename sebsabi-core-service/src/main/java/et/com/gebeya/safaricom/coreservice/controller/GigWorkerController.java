@@ -3,6 +3,7 @@ package et.com.gebeya.safaricom.coreservice.controller;
 
 import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentDto;
 import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentResponseDto;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ProposalDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserResponseRequestDto;
@@ -10,10 +11,14 @@ import et.com.gebeya.safaricom.coreservice.dto.responseDto.FormGigworkerDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.GigWorker;
+import et.com.gebeya.safaricom.coreservice.model.Wallet;
 import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.model.UserResponse;
 import et.com.gebeya.safaricom.coreservice.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,8 +26,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -34,7 +41,7 @@ public class GigWorkerController {
     private final FormService formService;
     private final UserResponseService userResponseService;
     private final PaymentService paymentService;
-
+    private final WalletService walletService;
     @PostMapping("/signup")
 //   @CircuitBreaker(name = "identity",fallbackMethod = "fallBackMethod")
 //   @TimeLimiter(name = "identity")
@@ -61,6 +68,15 @@ public class GigWorkerController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal(); // Get user ID
         return gigWorkerService.updateGigworker(Long.valueOf((Integer)userId), gigWorkerRequest);
+    }
+    @GetMapping("/search")
+    public ResponseEntity<Page<Form>> searchForms(
+            @RequestParam Map<String, String> requestParams,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        FormSearchRequestDto searchRequestDto = new FormSearchRequestDto(requestParams);
+        Page<Form> forms = formService.searchForms(searchRequestDto, pageable);
+        return new ResponseEntity<>(forms, HttpStatus.OK);
     }
 
     @GetMapping("/view/forms")
@@ -127,14 +143,22 @@ public class GigWorkerController {
         }
     }
 
-    @GetMapping("/balance-for-gigWorkers")
+    @GetMapping("/check/balance")
     public ResponseEntity<TransferPaymentResponseDto> checkBalanceForGigWoker(@RequestParam Long gigWorkerId) throws AccessDeniedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
         TransferPaymentResponseDto transferPaymentDto = new TransferPaymentResponseDto();
-        transferPaymentDto.setGigWorkerId((Long) userId);
-        TransferPaymentResponseDto responseDto = paymentService.checkBalanceForGigWorker(String.valueOf(gigWorkerId));
+        transferPaymentDto.setGigWorkerId(Long.valueOf((Integer) userId));
+        TransferPaymentResponseDto responseDto = paymentService.checkBalanceForGigWorker(Long.valueOf((Integer)userId));
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
 
     }
+    @PostMapping("/check/wallet/add-money")
+    public ResponseEntity<Wallet> addMoneyToWallet(@RequestParam BigDecimal amount) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        Wallet wallet = walletService.addMoneyToWallet(Long.valueOf((Integer)userId),amount);
+        return new ResponseEntity<>(wallet, HttpStatus.OK);
+    }
+
 }

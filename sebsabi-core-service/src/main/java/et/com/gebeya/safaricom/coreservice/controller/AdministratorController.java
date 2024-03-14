@@ -4,22 +4,21 @@ import et.com.gebeya.safaricom.coreservice.dto.analysisDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
-import et.com.gebeya.safaricom.coreservice.model.Client;
-import et.com.gebeya.safaricom.coreservice.model.Form;
-import et.com.gebeya.safaricom.coreservice.model.GigWorker;
+import et.com.gebeya.safaricom.coreservice.model.*;
 import et.com.gebeya.safaricom.coreservice.model.enums.Status;
-import et.com.gebeya.safaricom.coreservice.service.ClientService;
-import et.com.gebeya.safaricom.coreservice.service.FormService;
-import et.com.gebeya.safaricom.coreservice.service.GigWorkerService;
+import et.com.gebeya.safaricom.coreservice.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +29,8 @@ public class AdministratorController {
     private final ClientService clientService;
     private final GigWorkerService gigWorkerService;
     private final FormService formService;
+    private final PaymentService paymentService;
+    private final WalletService walletService;
 
     @GetMapping("/clients")
     public List<ClientResponse> getAllClient(){return clientService.getAllClients();}
@@ -119,5 +120,17 @@ public class AdministratorController {
     public List<FormsPerClientByStatusDTO> countFormsPerClientByStatus(@PathVariable("status") String status) {
         Status enumStatus = Status.valueOf(status);
         return formService.countFormsPerClientByStatus(enumStatus);
+    }
+    @GetMapping("/payments")
+    public ResponseEntity<List<Payment>> getAllPayments() {
+        List<Payment> payments = paymentService.getAllPayments();
+        return ResponseEntity.ok(payments);
+    }
+    @PostMapping("/check/wallet/add-money")
+    public ResponseEntity<Wallet> addMoneyToWallet(@RequestParam BigDecimal amount) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        Wallet wallet = walletService.addMoneyToWallet(Long.valueOf((Integer)userId),amount);
+        return new ResponseEntity<>(wallet, HttpStatus.OK);
     }
 }

@@ -31,8 +31,8 @@ public class Payment {
     @Valid
     @JsonIgnore
     private GigWorker gigWorker;
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long transactionNumber;
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+    private String transactionNumber;
 //payment status, transaction Number, Paid amount
     public Payment(TransferPaymentResponseDto paymentDto){
 

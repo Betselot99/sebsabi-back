@@ -21,17 +21,17 @@ public class AnswerAnalysisService {
         this.apachePOIUtils = apachePOIUtils;
     }
 
-    public AnswerAnalysisDTO analyzeAnswers(Long formId, Long clientId) throws IOException {
-        // Perform analysis using existing logic
-        AnswerAnalysisDTO analysisDTO = answerService.analyzeAnswers(formId, clientId);
-
-        // Additional analysis using Apache Commons Math
-
-        // Generate Excel report using Apache POI
-        byte[] excelReport = apachePOIUtils.generateExcelReport(analysisDTO);
-        analysisDTO.setExcelReport(excelReport);
-
-        return analysisDTO;
-    }
+//    public AnswerAnalysisDTO analyzeAnswers(Long formId, Long clientId) throws IOException {
+//        // Perform analysis using existing logic
+//        AnswerAnalysisDTO analysisDTO = answerService.analyzeAnswers(formId, clientId);
+//
+//        // Additional analysis using Apache Commons Math
+//
+//        // Generate Excel report using Apache POI
+//        byte[] excelReport = apachePOIUtils.generateExcelReport(analysisDTO);
+//        analysisDTO.setExcelReport(excelReport);
+//
+//        return analysisDTO;
+//    }
 }
 

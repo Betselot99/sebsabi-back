@@ -16,8 +16,8 @@ public class WalletService {
     private final WalletRepository walletRepository;
 
     @Transactional
-    public Wallet addMoneyToWallet(BigDecimal amount) {
-        Long userId = getUserIdFromSecurityContext();
+    public Wallet addMoneyToWallet(Long userId,BigDecimal amount) {
+//        Long userId = getUserIdFromSecurityContext();
         Wallet wallet = walletRepository.findByUserId(userId);
         if (wallet == null) {
             wallet = new Wallet();
@@ -29,12 +29,12 @@ public class WalletService {
         return walletRepository.save(wallet);
     }
 
-    private Long getUserIdFromSecurityContext() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Object userId = auth.getPrincipal();
-
-        return (Long) userId;
-    }
+//    private Long getUserIdFromSecurityContext() {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        Object userId = auth.getPrincipal();
+//
+//        return (Long) userId;
+//    }
 }
 
 

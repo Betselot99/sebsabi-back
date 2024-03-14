@@ -18,7 +18,7 @@ public class WalletController {
 
     @PostMapping("/add-money")
     public ResponseEntity<Wallet> addMoneyToWallet(@RequestParam Long userId, @RequestParam BigDecimal amount) {
-        Wallet wallet = walletService.addMoneyToWallet(amount);
+        Wallet wallet = walletService.addMoneyToWallet(userId,amount);
         return new ResponseEntity<>(wallet, HttpStatus.OK);
     }
 }
