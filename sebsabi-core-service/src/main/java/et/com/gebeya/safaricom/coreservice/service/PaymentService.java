@@ -56,6 +56,7 @@ public class PaymentService {
             responseDto.setMessage("Payment transferred successfully from client to admin.");
             return responseDto;
         }
+        throw new RuntimeException("Form Not Found");
     }
 
     @Transactional
@@ -125,7 +126,6 @@ public class PaymentService {
         paymentRepository.delete(user);
         return Map.of("message", "User Payment Account Deleted Successfully");
     }
-
 //    @Transactional
 //    public TransferPaymentResponseDto transferPaymentFromClientToAdmin(TransferPaymentDto transferPaymentDto, Long formId) throws AccessDeniedException {
 //    Form form = formService.getFormForClientByFormId(formId, transferPaymentDto.getClientId());
