@@ -87,11 +87,16 @@ public class PaymentService {
         throw new RuntimeException("Form Not Found");
     }
 
-    // Method to retrieve user's wallet
     private Wallet getUserWallet(String userId) {
-        return walletRepository.findByUserId(Long.valueOf(userId))
-                .orElseThrow(() -> new PaymentAccountNotFoundException("User's wallet not found."));
+        try {
+            return walletRepository.findByUserId(Long.valueOf(userId));
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Invalid user ID format", e);
+        } catch (Exception e) {
+            throw new RuntimeException("User's wallet not found", e);
+        }
     }
+
     public TransferPaymentResponseDto checkBalanceForGigWorker(String userId) {
         GigWorker assignedGigWorker = new GigWorker();
         Payment payment = getUser(String.valueOf(assignedGigWorker.getId()));
@@ -121,27 +126,6 @@ public class PaymentService {
         return Map.of("message", "User Payment Account Deleted Successfully");
     }
 
-    //    TransferPaymentResponseDto createPayment(PaymentDto paymentDto){
-//        Payment payment = MappingUtil.mapBalanceRequestDtoToBalance(paymentDto);
-//        payment.setAmount(BigDecimal.valueOf(0.0));
-//        payment = (Payment) paymentRepository.save(payment);
-//        return MappingUtil.mapBalanceToBalanceResponseDto(payment);
-//    }
-
-//    TransferPaymentResponseDto payingBalance(PaymentDto paymentDto){
-//        Payment provider = getUser(paymentDto.getUserId());
-//        if(paymentDto.getBalance().compareTo(BigDecimal.valueOf(100))< 0)
-//            throw new InsufficientAmountException("You don't have enough Amount to make payment");
-//        if(provider.getAmount().compareTo(paymentDto.getBalance())<0)
-//            throw new InsufficientAmountException("Your Balance is Insufficient. Please Add more Amount");
-//        provider.setAmount(provider.getAmount().subtract(paymentDto.getBalance()));
-//        return MappingUtil.mapBalanceToBalanceResponseDto((Payment) paymentRepository.save(provider));
-//            }
-//    TransferPaymentResponseDto depositBalance(PaymentDto paymentDto){
-//        Payment client = getUser(String.valueOf(paymentDto.getUserId()));
-//        client.setAmount(client.getAmount().add(paymentDto.getBalance()));
-//        return MappingUtil.mapBalanceToBalanceResponseDto((Payment) paymentRepository.save(client));
-//    }
 //    @Transactional
 //    public TransferPaymentResponseDto transferPaymentFromClientToAdmin(TransferPaymentDto transferPaymentDto, Long formId) throws AccessDeniedException {
 //    Form form = formService.getFormForClientByFormId(formId, transferPaymentDto.getClientId());
