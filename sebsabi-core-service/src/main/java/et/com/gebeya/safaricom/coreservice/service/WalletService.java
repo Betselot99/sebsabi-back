@@ -35,6 +35,10 @@ public class WalletService {
 //
 //        return (Long) userId;
 //    }
+
+    public Wallet createNewWallet(Wallet wallet){
+        return walletRepository.save(wallet);
+    }
 }
 
 

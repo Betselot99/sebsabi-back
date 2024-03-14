@@ -6,6 +6,7 @@ import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserRequestDto;
 import et.com.gebeya.safaricom.coreservice.event.ClientCreatedEvent;
 import et.com.gebeya.safaricom.coreservice.model.Client;
+import et.com.gebeya.safaricom.coreservice.model.Wallet;
 import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.model.enums.Authority;
 import et.com.gebeya.safaricom.coreservice.repository.ClientRepository;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +35,7 @@ import java.util.Optional;
 @Transactional
 public class ClientService {
     private final ClientRepository clientRepository;
+    private final WalletService walletService;
 
     private final WebClient.Builder webClientBuilder;
 
@@ -45,12 +48,21 @@ public class ClientService {
         createClientsUserInformation(client);
         client.setPassword(passwordEncoder().encode(clientRequest.getPassword()));
         clientRepository.save(client);
+        createWallet(client);
+
         log.info("Client {} is Created and saved", client.getFirstName());
-        clientRepository.save(client);
+        //clientRepository.save(client);
         String fullName = client.getFirstName() + " " + client.getLastName();
 
         kafkaTemplate.send("notificationTopic",new ClientCreatedEvent(client.getEmail(),fullName));
         return "Client  Signed up Successfully ";
+    }
+
+    private void createWallet(Client client) {
+        Wallet wallet=new Wallet();
+        wallet.setUserId(client.getId());
+        wallet.setAmount(new BigDecimal(0));
+
     }
 
 

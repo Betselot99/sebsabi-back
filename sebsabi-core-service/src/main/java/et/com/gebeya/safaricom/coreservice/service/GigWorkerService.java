@@ -8,8 +8,10 @@ import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerSearchRequest
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserRequestDto;
 import et.com.gebeya.safaricom.coreservice.event.ClientCreatedEvent;
+import et.com.gebeya.safaricom.coreservice.model.Client;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.GigWorker;
+import et.com.gebeya.safaricom.coreservice.model.Wallet;
 import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.model.enums.Authority;
 import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,9 +52,15 @@ public class GigWorkerService {
         createGigWorkersUserInformation(gigWorker);
         log.info("Gig-Worker {} is Created and saved",gigWorkerRequest.getFirstName());
         String fullName = gigWorker.getFirstName() + " " + gigWorker.getLastName();
-
+        createWallet(gigWorker);
         kafkaTemplate.send("notificationTopic",new ClientCreatedEvent(gigWorker.getEmail(),fullName));
         return "Gig worker Signed up Successfully ";
+    }
+    private void createWallet(GigWorker gigWorker) {
+        Wallet wallet=new Wallet();
+        wallet.setUserId(gigWorker.getId());
+        wallet.setAmount(new BigDecimal(0));
+
     }
     private void createGigWorkersUserInformation(GigWorker gigWorker) {
         UserRequestDto newUser=UserRequestDto.builder()

@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,5 +39,8 @@ public class GigwWorkerResponse {
         this.isActive=gigWorker.getIsActive();
 
         this.age=gigWorker.getAge();
+        this.testimonials = new ArrayList<>(gigWorker.getTestimonials());
+
     }
+
 }

@@ -159,8 +159,6 @@ public class ClientController {
     }
 
 
-
-
     @GetMapping("/view/form/proposal/{formId}")
     public ResponseEntity<List<Proposal>> getProposalsByFormId(@PathVariable Long formId) {
         List<Proposal> proposals = proposalService.getProposalsByFormId(formId);

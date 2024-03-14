@@ -32,8 +32,7 @@ public class AdministratorController {
     private final PaymentService paymentService;
     private final WalletService walletService;
 
-    @GetMapping("/clients")
-    public List<ClientResponse> getAllClient(){return clientService.getAllClients();}
+
     @GetMapping("/search/clients")
     public ResponseEntity<Page<Client>> searchClients(@RequestParam Map<String, String> requestParams,
                                                       @PageableDefault(size = 10) Pageable pageable) {
@@ -79,10 +78,7 @@ public class AdministratorController {
     public long getNumberOfClients(){
         return clientService.getNumberOfClients();
     }
-    @GetMapping("/gigworkers")
-    public List<GigwWorkerResponse> getAllGigWorkers(){
-        return gigWorkerService.getAllGigWorker();
-    }
+
     @GetMapping("/AllForms")
     public List<Form> getAllForms(){
         return formService.getAllForms();
