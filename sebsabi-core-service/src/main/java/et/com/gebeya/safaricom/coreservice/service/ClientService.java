@@ -4,7 +4,7 @@ import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserRequestDto;
-import et.com.gebeya.safaricom.coreservice.event.ClientCreatedEvent;
+import et.com.gebeya.safaricom.coreservice.event.CreationEvent;
 import et.com.gebeya.safaricom.coreservice.model.Client;
 import et.com.gebeya.safaricom.coreservice.model.Wallet;
 import et.com.gebeya.safaricom.coreservice.model.enums.Status;
@@ -39,7 +39,7 @@ public class ClientService {
 
     private final WebClient.Builder webClientBuilder;
 
-    private final KafkaTemplate<String, ClientCreatedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, CreationEvent> kafkaTemplate;
     @Transactional
     public String createClients(ClientRequest clientRequest) {
         Client client = new Client(clientRequest);
@@ -54,7 +54,7 @@ public class ClientService {
         //clientRepository.save(client);
         String fullName = client.getFirstName() + " " + client.getLastName();
 
-        kafkaTemplate.send("notificationTopic",new ClientCreatedEvent(client.getEmail(),fullName));
+        kafkaTemplate.send("CreateUser",new CreationEvent(client.getEmail(),fullName));
         return "Client  Signed up Successfully ";
     }
 

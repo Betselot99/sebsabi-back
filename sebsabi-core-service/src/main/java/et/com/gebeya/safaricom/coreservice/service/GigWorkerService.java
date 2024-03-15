@@ -7,8 +7,7 @@ import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserRequestDto;
-import et.com.gebeya.safaricom.coreservice.event.ClientCreatedEvent;
-import et.com.gebeya.safaricom.coreservice.model.Client;
+import et.com.gebeya.safaricom.coreservice.event.CreationEvent;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.GigWorker;
 import et.com.gebeya.safaricom.coreservice.model.Wallet;
@@ -43,7 +42,7 @@ public class GigWorkerService {
     private final GigWorkerRepository gigWorkerRepository;
     private final WebClient.Builder webClientBuilder;
     private final FormRepository formRepository;
-    private final KafkaTemplate<String,ClientCreatedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, CreationEvent> kafkaTemplate;
 
     @Transactional
     public String createGigWorkers(GigWorkerRequest gigWorkerRequest){
@@ -53,7 +52,7 @@ public class GigWorkerService {
         log.info("Gig-Worker {} is Created and saved",gigWorkerRequest.getFirstName());
         String fullName = gigWorker.getFirstName() + " " + gigWorker.getLastName();
         createWallet(gigWorker);
-        kafkaTemplate.send("notificationTopic",new ClientCreatedEvent(gigWorker.getEmail(),fullName));
+        kafkaTemplate.send("CreateUser",new CreationEvent(gigWorker.getEmail(),fullName));
         return "Gig worker Signed up Successfully ";
     }
     private void createWallet(GigWorker gigWorker) {

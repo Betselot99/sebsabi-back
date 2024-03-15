@@ -1,6 +1,5 @@
 package et.com.gebeya.notificationservice.service;
 
-import et.com.gebeya.notificationservice.kafka.ClientCreatedEvent;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;

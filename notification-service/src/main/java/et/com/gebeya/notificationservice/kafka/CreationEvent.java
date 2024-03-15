@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClientCreatedEvent {
-    private String clientEmail;
-    private String clientName;
-
+public class CreationEvent {
+    private String email;
+    private String name;
 }
+
