@@ -1,28 +1,29 @@
 package et.com.gebeya.safaricom.coreservice.service;
 
 
+import et.com.gebeya.safaricom.coreservice.dto.analysisDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormQuestionDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormSearchRequestDto;
+import et.com.gebeya.safaricom.coreservice.dto.responseDto.FormGigworkerDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.JobFormDisplaydto;
 import et.com.gebeya.safaricom.coreservice.model.*;
 import et.com.gebeya.safaricom.coreservice.model.enums.QuestionType;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
-import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserResponseRequestDto;
 import et.com.gebeya.safaricom.coreservice.repository.specification.FormSpecifications;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.AccessDeniedException;
-import java.util.Collections;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +37,8 @@ public class FormService {
 
     @Transactional
     public JobFormDisplaydto createForm(FormDto formDto, Long clientId) {
+        formDto.getStatus();
+
         Form newForm = new Form(formDto);
         Optional<Client> clientInfo = clientService.getClientId(clientId);
         if (clientInfo.isPresent()) {
@@ -93,8 +96,17 @@ public class FormService {
         return formRepository.findFormsByStatus(status);
     }
 
+//    public List<Form> getFormsByStatusClamied(Long gigWorkerId,Status status) {
+//        return formRepository.findFormsByAssignedGigWorkerIdAndStatus(gigWorkerId,Status.Claimed);
+//    }
+//
+
+
     public List<Form> getFormsByClientIdAndStatus(Long client_id, Status status) {
         return formRepository.findFormsByClient_IdAndStatus(client_id, status);
+    }
+    public List<Form> getFormsByGigWorkerIdAndStatus(Long gig_worker_id, Status status) {
+        return formRepository.findFormsByAssignedGigWorkerIdAndStatus(gig_worker_id, status);
     }
 
 
@@ -151,26 +163,81 @@ public class FormService {
     public Form getFormForGigWorker(Long formId, Long gig_worker_id) throws AccessDeniedException {
         return formRepository.findFormByIdAndAssignedGigWorkerId(formId, gig_worker_id).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
     }
+    public Form getFormForGigWorkerAndClient(Long form_id,Long client_id, Long gig_worker_id) throws AccessDeniedException {
+        return formRepository.findFormsByIdAndClient_IdAndAssignedGigWorkerId(form_id,client_id, gig_worker_id);
+    }
     public Form getFormForClientByFormId(Long formId, Long clientId) throws AccessDeniedException {
-        return formRepository.findFormByClient_IdAndId(formId, clientId).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
+        return formRepository.findFormByIdAndClient_Id(formId, clientId).orElseThrow(() -> new AccessDeniedException("You are not authorized to access this form"));
     }
 
+//    Object Mapper
 
-    public List<Object[]> countFormsByStatus() {
-        return formRepository.countFormsByStatus();
-    }
-    public List<Object[]> countFormsPerClient() {
-        return formRepository.countFormsPerClient();
-    }
-    public List<Object[]> countFormsAssignedToGigWorkers() {
-        return formRepository.countFormsAssignedToGigWorkers();
-    }
-    public List<Object[]> countProposalsPerForm() {
-        return formRepository.countProposalsPerForm();
+    public List<FormsByStatusDTO> countFormsByStatus() {
+        return formRepository.countFormsByStatus()
+                .stream()
+                .map(obj -> new FormsByStatusDTO((Status) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
     }
 
-    public List<Object[]> countFormsPerClientByStatus(Status status) {
-        return formRepository.countFormsPerClientByStatus(status);
+    public List<FormsPerClientDTO> countFormsPerClient() {
+        return formRepository.countFormsPerClient()
+                .stream()
+                .map(obj -> new FormsPerClientDTO((Long) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
     }
 
+    public List<FormsAssignedToGigWorkersDTO> countFormsAssignedToGigWorkers() {
+        return formRepository.countFormsAssignedToGigWorkers()
+                .stream()
+                .map(obj -> new FormsAssignedToGigWorkersDTO((Long) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
+    }
+
+    public List<ProposalsPerFormDTO> countProposalsPerForm() {
+        return formRepository.countProposalsPerForm()
+                .stream()
+                .map(obj -> new ProposalsPerFormDTO((Long) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
+    }
+
+    public List<FormsPerClientByStatusDTO> countFormsPerClientByStatus(Status status) {
+        return formRepository.countFormsPerClientByStatus(status)
+                .stream()
+                .map(obj -> new FormsPerClientByStatusDTO((Long) obj[0], (Long) obj[1]))
+                .collect(Collectors.toList());
+    }
+    public Page<Form> searchForms(FormSearchRequestDto searchRequestDto, Pageable pageable) {
+        Specification<Form> spec = Specification.where(null);
+
+        String title = searchRequestDto.getTitle();
+        if (title != null && !title.isEmpty()) {
+            spec = spec.and(FormSpecifications.formByTitle(title));
+        }
+
+        LocalDate createdOn = searchRequestDto.getCreatedOn();
+        if (createdOn != null) {
+            spec = spec.and(FormSpecifications.formByCreatedOn(createdOn));
+        }
+
+        return formRepository.findAll(spec, pageable);
+    }
+    public Page<Form> searchClientForms(FormSearchRequestDto searchRequestDto,Long clientId, Pageable pageable) {
+
+        Specification<Form> spec = Specification.where(null);
+
+        String title = searchRequestDto.getTitle();
+        if (title != null && !title.isEmpty()) {
+            spec = spec.and(FormSpecifications.formByTitle(title));
+        }
+
+        LocalDate createdOn = searchRequestDto.getCreatedOn();
+        if (createdOn != null) {
+            spec = spec.and(FormSpecifications.formByCreatedOn(createdOn));
+        }
+
+        // Add specification to filter by client ID
+        spec = spec.and(FormSpecifications.formByClientId(clientId));
+
+        return formRepository.findAll(spec, pageable);
+    }
 }

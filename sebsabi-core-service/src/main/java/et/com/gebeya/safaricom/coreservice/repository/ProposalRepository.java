@@ -10,4 +10,7 @@ import java.util.List;
 @Repository
 public interface ProposalRepository extends JpaRepository <Proposal, Long>{
     List<Proposal> findByFormId(Long formId);
+    List<Proposal> findByGigWorkerId(Long gigWorkerId);
+    Proposal findProposalByFormIdAndGigWorkerId(Long formId,Long gigWorkerId);
+
 }

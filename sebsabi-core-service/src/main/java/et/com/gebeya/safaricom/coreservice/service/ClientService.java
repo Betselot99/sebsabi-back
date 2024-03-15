@@ -1,22 +1,31 @@
 package et.com.gebeya.safaricom.coreservice.service;
 
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientRequest;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserRequestDto;
-import et.com.gebeya.safaricom.coreservice.event.ClientCreatedEvent;
+import et.com.gebeya.safaricom.coreservice.event.CreationEvent;
 import et.com.gebeya.safaricom.coreservice.model.Client;
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.Wallet;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.model.enums.Authority;
 import et.com.gebeya.safaricom.coreservice.repository.ClientRepository;
+import et.com.gebeya.safaricom.coreservice.repository.specification.ClientSpecifications;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,22 +35,34 @@ import java.util.Optional;
 @Transactional
 public class ClientService {
     private final ClientRepository clientRepository;
+    private final WalletService walletService;
 
     private final WebClient.Builder webClientBuilder;
 
-    private final KafkaTemplate<String, ClientCreatedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, CreationEvent> kafkaTemplate;
     @Transactional
     public String createClients(ClientRequest clientRequest) {
         Client client = new Client(clientRequest);
         clientRepository.save(client);
         // log.info(client.getId().toString());
         createClientsUserInformation(client);
-        log.info("Client {} is Created and saved", client.getFirstName());
+        client.setPassword(passwordEncoder().encode(clientRequest.getPassword()));
         clientRepository.save(client);
+        createWallet(client);
+
+        log.info("Client {} is Created and saved", client.getFirstName());
+        //clientRepository.save(client);
         String fullName = client.getFirstName() + " " + client.getLastName();
 
-        kafkaTemplate.send("notificationTopic",new ClientCreatedEvent(client.getEmail(),fullName));
+        kafkaTemplate.send("CreateUser",new CreationEvent(client.getEmail(),fullName));
         return "Client  Signed up Successfully ";
+    }
+
+    private void createWallet(Client client) {
+        Wallet wallet=new Wallet();
+        wallet.setUserId(client.getId());
+        wallet.setAmount(new BigDecimal(0));
+
     }
 
 
@@ -62,24 +83,31 @@ public class ClientService {
                 .block();
         // log.info("Response from identity micro service==> {}", response);
     }
-    private void updateClientsUserInformation(Client client) {
+    private void updateClientsUserInformation(Client client,String newPassword) {
         // Create a UserRequestDto object with only the password field set
         UserRequestDto updateUser = UserRequestDto.builder()
                 .userId(client.getId())
-                .password(client.getPassword()) // Assuming this is the password field in the Client object
+                .userName(client.getEmail())
+                .name(client.getFirstName())
+                .password(newPassword)
+                .authority(Authority.CLIENT)
+                .isActive(true)
                 .build(); // Build the UserRequestDto object
+        log.info(updateUser.toString());
 
-        // Make a POST request to update the password in the identity service
-        String response = webClientBuilder.build().post()
-                .uri("http://identity-service/api/auth/reset/password")
-                .bodyValue(updateUser) // Pass the UserRequestDto object as the body
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+            // Make a POST request to update the password in the identity service
+            String response = webClientBuilder.build().post()
+                    .uri("http://identity-service/api/auth/reset/password")
+                    .bodyValue(updateUser) // Pass the serialized JSON string as the body
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-        // Log the response from the identity microservice
-        // log.info("Response from identity micro service==> {}", response);
+            // Log the response from the identity microservice
+            log.info("Response from identity micro service==> {}", response);
+
     }
+
 
     public List<ClientResponse> getAllClients() {
         List<Client> clients = clientRepository.findAll();
@@ -116,9 +144,13 @@ public class ClientService {
             // Check if the ClientRequest contains a non-null password
             if (clientRequest.getPassword() != null && !clientRequest.getPassword().isEmpty()) {
                 // If password is being updated, call updateClientsUserInformation method
-                existingClient.setPassword(clientRequest.getPassword());
+                updateClientsUserInformation(existingClient,clientRequest.getPassword());
 
-                updateClientsUserInformation(existingClient);
+                existingClient.setPassword(passwordEncoder().encode(clientRequest.getPassword()));
+            }
+            if (clientRequest.getEmail() != null && !clientRequest.getEmail().isEmpty()) {
+                // If password is being updated, call updateClientsUserInformation method
+               throw new RuntimeException("Cant change Username");
             }
 
             // Use NullAwareBeanUtilsBean to handle null properties
@@ -167,8 +199,40 @@ public class ClientService {
         return clientRepository.countClientsByIsActive(Status.Active);
     }
 
-    public List<Object[]> countClientsByCompanyType() {
-        return clientRepository.countClientsByCompanyType();
+//    public List<Object[]> countClientsByCompanyType() {
+//        return clientRepository.countClientsByCompanyType();
+//    }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
+    public Page<Client> searchClients(ClientSearchRequestDto searchRequestDto, Pageable pageable) {
+        String firstName = searchRequestDto.getFirstName();
+        String lastName = searchRequestDto.getLastName();
+        String companyType = searchRequestDto.getCompanyType();
+        String email = searchRequestDto.getEmail();
 
+
+        Specification<Client> spec = Specification.where(null);
+
+        if (firstName != null && !firstName.isEmpty()) {
+            spec = spec.and(ClientSpecifications.clientByFirstName(firstName));
+        }
+
+        if (lastName != null && !lastName.isEmpty()) {
+            spec = spec.and(ClientSpecifications.clientByLastName(lastName));
+        }
+
+        if (companyType != null && !companyType.isEmpty()) {
+            spec = spec.and(ClientSpecifications.clientByCompanyType(companyType));
+        }
+
+        if (email != null && !email.isEmpty()) {
+            spec = spec.and(ClientSpecifications.clientByEmail(email));
+        }
+        // Adding isActive criteria
+
+
+
+        return clientRepository.findAll(spec, pageable);
+    }
 }

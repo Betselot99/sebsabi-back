@@ -2,8 +2,9 @@ package et.com.gebeya.safaricom.coreservice.service;
 
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.AnswerDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserResponseRequestDto;
-import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.model.*;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
+import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.repository.UserResponseRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +23,7 @@ public class UserResponseService {
 
     private final UserResponseRepository userResponseRepository;
     private final FormService formService;
+    private final FormRepository formRepository;
     private final GigWorkerService gigWorkerService;
 
     private final AnswerService answerService;
@@ -54,7 +54,13 @@ public class UserResponseService {
 
                 // Handle different question types
                 switch (question.getQuestionType()) {
-                    case TEXT -> answer.setAnswerText(answerDto.getAnswerText());
+                    case TEXT -> {
+                        answer.setAnswerText(answerDto.getAnswerText());
+                    }
+                    case TRUE_FALSE -> {
+                        answer.setAnswerText(answerDto.getAnswerText());
+                        break;
+                    }
                     case MULTIPLE_CHOICE -> {
                         List<MultipleChoiceOption> selectedOptions = answerDto.getSelectedOptions().stream()
                                 .map(optionId -> question.getMultipleChoiceOptions().stream()
@@ -64,7 +70,9 @@ public class UserResponseService {
                                 .collect(Collectors.toList());
                         answer.setSelectedOptions(selectedOptions);
                     }
-                    case RATING_SCALE -> answer.setRating(answerDto.getRating());
+                    case RATING_SCALE -> {
+                        answer.setRating(answerDto.getRating());
+                    }
                     default -> throw new RuntimeException("Unsupported question type");
                 }
 
@@ -76,8 +84,15 @@ public class UserResponseService {
             userResponse.setAnswers(answers);
 
             // Save the UserResponse entity
-            return userResponseRepository.save(userResponse);
+            if (form.getUsageLimit() - countUserResponsesByFormId(form.getId()) == 1) {
+                form.setStatus(Status.Completed);
+            }
+            formRepository.save(form);
+            userResponse=userResponseRepository.save(userResponse);
+            return userResponse;
         } else {
+            form.setStatus(Status.Completed);
+            formRepository.save(form);
             throw new RuntimeException("Form limit has been reached");
         }
 

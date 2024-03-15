@@ -4,26 +4,34 @@ package et.com.gebeya.safaricom.coreservice.service;
 import et.com.gebeya.safaricom.coreservice.Exceptions.FormNotFoundException;
 import et.com.gebeya.safaricom.coreservice.Exceptions.GigWorkerNotFoundException;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
+import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserRequestDto;
-import et.com.gebeya.safaricom.coreservice.event.ClientCreatedEvent;
-import et.com.gebeya.safaricom.coreservice.model.Client;
+import et.com.gebeya.safaricom.coreservice.event.CreationEvent;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.GigWorker;
-import et.com.gebeya.safaricom.coreservice.model.Status;
+import et.com.gebeya.safaricom.coreservice.model.Wallet;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import et.com.gebeya.safaricom.coreservice.model.enums.Authority;
 import et.com.gebeya.safaricom.coreservice.repository.FormRepository;
 import et.com.gebeya.safaricom.coreservice.repository.GigWorkerRepository;
 
+import et.com.gebeya.safaricom.coreservice.repository.specification.GigworkerSpecifications;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +42,7 @@ public class GigWorkerService {
     private final GigWorkerRepository gigWorkerRepository;
     private final WebClient.Builder webClientBuilder;
     private final FormRepository formRepository;
-    private final KafkaTemplate<String,ClientCreatedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, CreationEvent> kafkaTemplate;
 
     @Transactional
     public String createGigWorkers(GigWorkerRequest gigWorkerRequest){
@@ -43,9 +51,15 @@ public class GigWorkerService {
         createGigWorkersUserInformation(gigWorker);
         log.info("Gig-Worker {} is Created and saved",gigWorkerRequest.getFirstName());
         String fullName = gigWorker.getFirstName() + " " + gigWorker.getLastName();
-
-        kafkaTemplate.send("notificationTopic",new ClientCreatedEvent(gigWorker.getEmail(),fullName));
+        createWallet(gigWorker);
+        kafkaTemplate.send("CreateUser",new CreationEvent(gigWorker.getEmail(),fullName));
         return "Gig worker Signed up Successfully ";
+    }
+    private void createWallet(GigWorker gigWorker) {
+        Wallet wallet=new Wallet();
+        wallet.setUserId(gigWorker.getId());
+        wallet.setAmount(new BigDecimal(0));
+
     }
     private void createGigWorkersUserInformation(GigWorker gigWorker) {
         UserRequestDto newUser=UserRequestDto.builder()
@@ -103,12 +117,18 @@ public class GigWorkerService {
         return gigWorkerRepository.save(gigWorker);
     }
 
-    public void updateGigworkersUserInformation(GigWorker gigWorker) {
+    public void updateGigworkersUserInformation(GigWorker gigWorker,String newPassword) {
+        // Create a UserRequestDto object with only the password field set
         // Create a UserRequestDto object with only the password field set
         UserRequestDto updateUser = UserRequestDto.builder()
                 .userId(gigWorker.getId())
-                .password(gigWorker.getPassword()) // Assuming this is the password field in the Client object
+                .userName(gigWorker.getEmail())
+                .name(gigWorker.getFirstName())
+                .password(newPassword)
+                .authority(Authority.CLIENT)
+                .isActive(true)
                 .build(); // Build the UserRequestDto object
+        log.info(updateUser.toString());
 
         // Make a POST request to update the password in the identity service
         String response = webClientBuilder.build().post()
@@ -133,9 +153,10 @@ public class GigWorkerService {
             // Check if the ClientRequest contains a non-null password
             if (gigWorkerRequest.getPassword() != null && !gigWorkerRequest.getPassword().isEmpty()) {
                 // If password is being updated, call updateClientsUserInformation method
-                existingGigworker.setPassword(gigWorkerRequest.getPassword());
 
-                updateGigworkersUserInformation(existingGigworker);
+
+                updateGigworkersUserInformation(existingGigworker,gigWorkerRequest.getPassword());
+                existingGigworker.setPassword(passwordEncoder().encode(gigWorkerRequest.getPassword()));
             }
 
             // Use NullAwareBeanUtilsBean to handle null properties
@@ -150,6 +171,9 @@ public class GigWorkerService {
         } else {
             throw new RuntimeException("Client not found with id: " + id);
         }
+    }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 
@@ -182,5 +206,34 @@ public class GigWorkerService {
     public long getNumberofGigWokers(){
         return gigWorkerRepository.countGigWorkersByIsActive(Status.Active);
     }
+    public Page<GigWorker> searchGigworker(GigWorkerSearchRequestDto searchRequestDto, Pageable pageable) {
+        String firstName = searchRequestDto.getFirstName();
+        String lastName = searchRequestDto.getLastName();
+        String qualification = searchRequestDto.getQualification();
+        String email = searchRequestDto.getEmail();
 
+
+        Specification<GigWorker> spec = Specification.where(null);
+
+        if (firstName != null && !firstName.isEmpty()) {
+            spec = spec.and(GigworkerSpecifications.gigWorkerByFirstName(firstName));
+        }
+
+        if (lastName != null && !lastName.isEmpty()) {
+            spec = spec.and(GigworkerSpecifications.gigWorkerByLastName(lastName));
+        }
+
+        if (qualification != null && !qualification.isEmpty()) {
+            spec = spec.and(GigworkerSpecifications.gigWorkerByQualification(qualification));
+        }
+
+        if (email != null && !email.isEmpty()) {
+            spec = spec.and(GigworkerSpecifications.gigWorkerByEmail(email));
+        }
+        // Adding isActive criteria
+
+
+
+        return gigWorkerRepository.findAll(spec, pageable);
+    }
 }

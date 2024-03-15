@@ -37,7 +37,9 @@ public class SecurityConfig {
                     "swagger-ui/index.html#/",
                     "/v3/api-docs/**",
                     "/api/core/client/signup",
-                    "/api/core/gig-worker/signup"
+                    "/api/core/gig-worker/signup",
+                    "/api/core/calculate",
+                    "/api/wallet/add-money"
 
             };
     public static final String[] ADMIN_MATCHERS = {
@@ -52,21 +54,33 @@ public class SecurityConfig {
                     "/api/core/client/create/form",
                     "/api/core/client/create/form/add/question-to-form",
 //                    "/api/core/client/view/forms/by_params",
-                    "/api/core/client/view/form/status",
                     "/api/core/client/view/form/proposal/**",
                     "/api/core/client/view/form/proposal/accept/**",
                     "/api/core/client/view/form/update",
+                    "/api/core/client/search/form",
                     "/api/core/client/view/form/status/**",
-                    "/api/core/client/view/form/update/questions"
+                    "api/core/client/view/forms/completed/giveTestimonials",
+                    "/api/core/client/view/form/progress/**",
+                    "/api/core/client/view/form/update/questions/**",
+                    "/api/core/client/view/form/completed/analyze",
+                    "/api/core/client/pay",
+                    "/api/core/client/check/wallet",
+                    "/api/core/client/check/invoice",
+                    "/api/core/client/check/wallet/add-money",
+                    "/api/core/client/view/form/completed/analyze",
+                    "/api/core/client/view/form/completed/analyze/download"
             };
     public static final String[] GIGWORKER_MATCHERS =
             {
                     "/api/core/gig-worker/view/profile",
                     "/api/core/gig-worker/view/profile/update",
-                    "/api/core/gig-worker/view/forms",
+                    "/api/core/gig-worker/view/forms/**",
                     "/api/core/gig-worker/view/forms/proposal/submit",
                     "/api/core/gig-worker/view/forms/formQuestion/submit-response",
-                    "/api/core/gig-worker/view/form/status/**"
+                    "/api/core/gig-worker/view/form/**",
+                    "/api/core/gig-worker/check/balance",
+                    "/api/core/gig-worker/check/wallet",
+                    "/api/core/gig-worker/check/wallet/add-money",
 
             };
 

@@ -105,13 +105,17 @@ public class AuthenticationService {
                 .build();
         return new ResponseEntity<>(responseDto, HttpStatus.NOT_FOUND);
     }
-    public UserResponseDto updatePasswordNormally(UserRequestDto userRequestDto) throws InvocationTargetException, IllegalAccessException {
-        if (userRequestDto!=null) {
-            return userCredentialsService.updateUsers(userRequestDto);
 
+
+    public ResponseEntity<UserResponseDto> updatePasswordNormally(UserRequestDto userRequestDto) throws InvocationTargetException, IllegalAccessException {
+        final String userName=userRequestDto.getUserName();
+        if(userRepository.findFirstByUserName(userName).isPresent()){
+            UserResponseDto responseDto=userCredentialsService.updateUsers(userRequestDto);
+            new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+        }else{
+            throw new RuntimeException("User Cannot be Found  with this email");
         }
-
-        throw new RuntimeException();
+        return new ResponseEntity<>(HttpStatus.IM_USED);
     }
 }
 

@@ -1,5 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ClientRequest;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,7 +22,14 @@ public class Client extends Person{
 
    @OneToMany(cascade = CascadeType.ALL)
    @JoinColumn(name = "form_id")
+
    private List<Form> forms;
+
+   @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+   private List<Testimonial> testimonials;
+
+   @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+   private List<Rating> ratings;
 
    public Client(ClientRequest clientRequest){
       this.setFirstName(clientRequest.getFirstName());

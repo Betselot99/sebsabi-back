@@ -1,8 +1,8 @@
 package et.com.gebeya.safaricom.coreservice.repository;
 
+import et.com.gebeya.safaricom.coreservice.dto.responseDto.FormGigworkerDto;
 import et.com.gebeya.safaricom.coreservice.model.Form;
-import et.com.gebeya.safaricom.coreservice.model.Status;
-import jakarta.ws.rs.core.EntityPart;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,8 +18,9 @@ import java.util.Optional;
 public interface FormRepository extends JpaRepository<Form, Long> {
 
     Optional<Form> findFormByIdAndAssignedGigWorkerId(Long id,Long gig_worker_id);
-    Optional<Form> findFormByClient_IdAndId(Long id, Long client_id);
+    Optional<Form> findFormByIdAndClient_Id(Long id, Long client_id);
     Optional<Form> findFormByClient_Id(Long client_id);
+    List<Form> findFormsByAssignedGigWorkerIdAndStatus(Long gig_worker_id, Status status);
 
 
     List<Form> findFormsByStatus(Status status);
@@ -38,4 +39,8 @@ public interface FormRepository extends JpaRepository<Form, Long> {
     List<Object[]> countFormsPerClient();
     @Query("SELECT c.id, COUNT(f) FROM Client c LEFT JOIN c.forms f WHERE f.status = :status GROUP BY c.id")
     List<Object[]> countFormsPerClientByStatus(@Param("status") Status status);
+
+    Page<Form> findAll(Specification<Form> spec, Pageable pageable);
+
+    Form findFormsByIdAndClient_IdAndAssignedGigWorkerId(Long id,Long client_id,Long gig_worker_id);
 }

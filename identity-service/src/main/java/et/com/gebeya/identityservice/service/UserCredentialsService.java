@@ -9,8 +9,6 @@ import et.com.gebeya.identityservice.repository.UserCredentialsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtilsBean;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -42,8 +40,8 @@ public class UserCredentialsService {
         };
     }
 
-    public UserCredentials createUpdateUser(UserCredentials users) {
-        return userCredentialsRepository.save(users);
+    public void createUpdateUser(UserCredentials users) {
+        userCredentialsRepository.save(users);
     }
 
     public UserCredentials loadUserByUsername(String userName) {
@@ -72,7 +70,12 @@ public class UserCredentialsService {
         Optional<UserCredentials> existingUserOptional = userCredentialsRepository.findByUserId(userRequestDto.getUserId());
         if (existingUserOptional.isPresent()) {
             UserCredentials existingClient = existingUserOptional.get();
+            // Encode and set the password
+            if (userRequestDto.getPassword() != null) {
+                log.info(userRequestDto.getPassword());
+                existingClient.setPassword(passwordEncoder().encode(userRequestDto.getPassword())); // Assuming you have a method to encode passwords
 
+            }
             // Use NullAwareBeanUtilsBean to handle null properties
             BeanUtilsBean notNullBeanUtils = new NullAwareBeanUtilsBean();
             notNullBeanUtils.copyProperties(existingClient, userRequestDto.getPassword());
@@ -96,6 +99,11 @@ public class UserCredentialsService {
                     // If the value is 0 (default value for int), we don't want to copy it
                     return;
                 }
+                if (value instanceof Long && (Long) value == 0) {
+                    // If the value is 0 (default value for long), we don't want to copy it
+                    return;
+                }
+
                 if (value instanceof Boolean) {
                     // If the value is of type Boolean, directly copy it
                     super.copyProperty(dest, name, value);

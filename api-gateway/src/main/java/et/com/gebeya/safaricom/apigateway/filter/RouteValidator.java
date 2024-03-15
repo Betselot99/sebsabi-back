@@ -11,6 +11,8 @@ public class RouteValidator {
 
     public static final List<String> openApiEndpoints = List.of(
             "/api/auth/register",
+            "/api/core/our-websocket",
+            "/api/core/calculate",
             "/api/auth/login",
             "/api/core/client/signup",
             "/api/core/gig-worker/signup",
