@@ -3,6 +3,7 @@ package et.com.gebeya.safaricom.coreservice.controller;
 import et.com.gebeya.safaricom.coreservice.Exceptions.FormNotFoundException;
 import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentDto;
 import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentResponseDto;
+import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.WalletCheckDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.AnswerAnalysisDTO;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
@@ -263,19 +264,17 @@ public class ClientController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping("/check/wallet")
-    public ResponseEntity<TransferPaymentResponseDto> checkBalanceForClient(){
+    public ResponseEntity<WalletCheckDto> checkBalanceForClient(){
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Object userId = auth.getPrincipal();
-            TransferPaymentDto transferPaymentDto = new TransferPaymentDto();
-            transferPaymentDto.setClientId(Long.valueOf((Integer) userId));
-            TransferPaymentResponseDto responseDto = paymentService.checkBalanceForClient(Long.valueOf((Integer)userId));
+            WalletCheckDto responseDto = walletService.getClientWallet(Long.valueOf((Integer)userId));
             return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
     @PostMapping("/check/wallet/add-money")
     public ResponseEntity<Wallet> addMoneyToWallet(@RequestParam BigDecimal amount) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
-        Wallet wallet = walletService.addMoneyToWallet(Long.valueOf((Integer)userId),amount);
+        Wallet wallet = walletService.addMoneyToClientWallet(Long.valueOf((Integer)userId),amount);
         return new ResponseEntity<>(wallet, HttpStatus.OK);
     }
 }

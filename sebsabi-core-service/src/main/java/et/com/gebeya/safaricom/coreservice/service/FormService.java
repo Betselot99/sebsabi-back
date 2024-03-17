@@ -219,6 +219,16 @@ public class FormService {
             spec = spec.and(FormSpecifications.formByCreatedOn(createdOn));
         }
 
+        String title = searchRequestDto.getTitle();
+        if (title != null && !title.isEmpty()) {
+            spec = spec.and(FormSpecifications.formByTitle(title));
+        }
+
+        LocalDate createdOn = searchRequestDto.getCreatedOn();
+        if (createdOn != null) {
+            spec = spec.and(FormSpecifications.formByCreatedOn(createdOn));
+        }
+        spec = spec.and(FormSpecifications.formByStatus(Status.Posted));
         return formRepository.findAll(spec, pageable);
     }
     public Page<Form> searchClientForms(FormSearchRequestDto searchRequestDto,Long clientId, Pageable pageable) {

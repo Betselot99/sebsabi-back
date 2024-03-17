@@ -60,9 +60,9 @@ public class ClientService {
 
     private void createWallet(Client client) {
         Wallet wallet=new Wallet();
-        wallet.setUserId(client.getId());
-        wallet.setAmount(new BigDecimal(0));
-
+        wallet.setClientId(client.getId());
+        wallet.setAmount(new BigDecimal(20000));
+        walletService.createNewWallet(wallet);
     }
 
 

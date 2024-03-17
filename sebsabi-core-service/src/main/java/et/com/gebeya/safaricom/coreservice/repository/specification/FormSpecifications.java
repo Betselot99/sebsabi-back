@@ -19,4 +19,7 @@ public class FormSpecifications {
     public static Specification<Form> formByClientId(Long clientId) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("client").get("id"), clientId);
     }
+    public static Specification<Form> formByStatus(Status status) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), status);
+    }
 }
