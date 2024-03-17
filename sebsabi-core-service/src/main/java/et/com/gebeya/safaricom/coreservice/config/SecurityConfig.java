@@ -1,5 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.config;
 
+import et.com.gebeya.safaricom.coreservice.dto.WalletDto;
 import et.com.gebeya.safaricom.coreservice.filter.RoleHeaderAuthenticationFilter;
 import et.com.gebeya.safaricom.coreservice.filter.RoleHeaderAuthenticationProvider;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +21,8 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import java.math.BigDecimal;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -75,6 +78,7 @@ public class SecurityConfig {
                     "/api/core/gig-worker/view/profile",
                     "/api/core/gig-worker/view/profile/update",
                     "/api/core/gig-worker/view/forms/**",
+                    "/api/core/gig-worker/search/form",
                     "/api/core/gig-worker/view/forms/proposal/submit",
                     "/api/core/gig-worker/view/forms/formQuestion/submit-response",
                     "/api/core/gig-worker/view/form/**",
@@ -134,8 +138,17 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        return new RoleHeaderAuthenticationProvider();
+
+            //createAdminWallet();
+            return new RoleHeaderAuthenticationProvider();
     }
+    private void createAdminWallet(){
+        WalletDto newUser = WalletDto.builder()
+                .userId(0L)
+                .amount(BigDecimal.valueOf(20000))
+                .build();
+    }
+
 
     @Bean
     public AuthenticationEntryPoint unauthorizedEntryPoint() {

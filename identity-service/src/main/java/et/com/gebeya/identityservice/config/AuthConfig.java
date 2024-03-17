@@ -2,9 +2,12 @@ package et.com.gebeya.identityservice.config;
 
 import et.com.gebeya.identityservice.entity.Authority;
 import et.com.gebeya.identityservice.entity.UserCredentials;
+import et.com.gebeya.identityservice.entity.Wallet;
 import et.com.gebeya.identityservice.filter.JwtAuthFilter;
 import et.com.gebeya.identityservice.service.UserCredentialsService;
+import et.com.gebeya.identityservice.service.WalletService;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,19 +23,25 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.math.BigDecimal;
+
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class AuthConfig {
 
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserCredentialsService usersService;
+    private final WalletService walletService;
 
-    public AuthConfig(JwtAuthFilter jwtAuthFilter, UserCredentialsService usersService) {
+
+    public AuthConfig(JwtAuthFilter jwtAuthFilter, UserCredentialsService usersService, WalletService walletService) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.usersService = usersService;
+        this.walletService = walletService;
     }
 
     @Bean
@@ -67,24 +76,15 @@ public class AuthConfig {
                     .userId(0L)
                     .password(passwordEncoder().encode("password"))
                     .build();
+            Wallet wallet=Wallet.builder()
+                    .userId(0L)
+                            .amount(BigDecimal.valueOf(20000))
+                                    .build();
+            walletService.createNewWallet(wallet);
             usersService.createUpdateUser(users);
         }
     }
-//    private void createClientUser() {
-//        try {
-//            UserCredentials users = usersService.loadUserByUsername("admin");
-//        } catch (Exception e) {
-//            UserCredentials users = UserCredentials.builder()
-//                    .name("Alazar")
-//                    .isActive(true)
-//                    .authority(Authority.CLIENT)
-//                    .userName("alazartilahun13@gmail.com")
-//                    .userId(0L)
-//                    .password(passwordEncoder().encode("152415"))
-//                    .build();
-//            usersService.createUpdateUser(users);
-//        }
-//    }
+
 
 
     @Bean

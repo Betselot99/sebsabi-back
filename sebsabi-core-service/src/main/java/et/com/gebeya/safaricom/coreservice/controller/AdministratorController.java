@@ -1,5 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.controller;
 
+import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.WalletCheckDto;
 import et.com.gebeya.safaricom.coreservice.dto.analysisDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.*;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.ClientResponse;
@@ -57,6 +58,7 @@ public class AdministratorController {
         }
         throw new RuntimeException("Your not authorized to make other changes");
     }
+
     @GetMapping("/search")
     public ResponseEntity<Page<Form>> searchForms(
             @RequestParam Map<String, String> requestParams,
@@ -128,5 +130,12 @@ public class AdministratorController {
         Object userId = auth.getPrincipal();
         Wallet wallet = walletService.addMoneyToWallet(Long.valueOf((Integer)userId),amount);
         return new ResponseEntity<>(wallet, HttpStatus.OK);
+    }
+    @GetMapping("/check/wallet")
+    public ResponseEntity<WalletCheckDto> checkBalanceForAdmin(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object userId = auth.getPrincipal();
+        WalletCheckDto responseDto = walletService.getAdminWallet(Long.valueOf((Integer)userId));
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 }

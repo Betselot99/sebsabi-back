@@ -7,7 +7,6 @@ import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.responseDto.GigwWorkerResponse;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.UserRequestDto;
-import et.com.gebeya.safaricom.coreservice.event.CreationEvent;
 import et.com.gebeya.safaricom.coreservice.model.Form;
 import et.com.gebeya.safaricom.coreservice.model.GigWorker;
 import et.com.gebeya.safaricom.coreservice.model.Wallet;
@@ -42,7 +41,7 @@ public class GigWorkerService {
     private final GigWorkerRepository gigWorkerRepository;
     private final WebClient.Builder webClientBuilder;
     private final FormRepository formRepository;
-    private final KafkaTemplate<String, CreationEvent> kafkaTemplate;
+    private final WalletService walletService;
 
     @Transactional
     public String createGigWorkers(GigWorkerRequest gigWorkerRequest){
@@ -52,13 +51,13 @@ public class GigWorkerService {
         log.info("Gig-Worker {} is Created and saved",gigWorkerRequest.getFirstName());
         String fullName = gigWorker.getFirstName() + " " + gigWorker.getLastName();
         createWallet(gigWorker);
-        kafkaTemplate.send("CreateUser",new CreationEvent(gigWorker.getEmail(),fullName));
         return "Gig worker Signed up Successfully ";
     }
     private void createWallet(GigWorker gigWorker) {
         Wallet wallet=new Wallet();
-        wallet.setUserId(gigWorker.getId());
+        wallet.setGigWorkerId(gigWorker.getId());
         wallet.setAmount(new BigDecimal(0));
+        walletService.createNewWallet(wallet);
 
     }
     private void createGigWorkersUserInformation(GigWorker gigWorker) {
@@ -153,8 +152,6 @@ public class GigWorkerService {
             // Check if the ClientRequest contains a non-null password
             if (gigWorkerRequest.getPassword() != null && !gigWorkerRequest.getPassword().isEmpty()) {
                 // If password is being updated, call updateClientsUserInformation method
-
-
                 updateGigworkersUserInformation(existingGigworker,gigWorkerRequest.getPassword());
                 existingGigworker.setPassword(passwordEncoder().encode(gigWorkerRequest.getPassword()));
             }

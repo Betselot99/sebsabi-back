@@ -1,6 +1,6 @@
-package et.com.gebeya.safaricom.coreservice.repository;
+package et.com.gebeya.identityservice.repository;
 
-import et.com.gebeya.safaricom.coreservice.model.Wallet;
+import et.com.gebeya.identityservice.entity.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

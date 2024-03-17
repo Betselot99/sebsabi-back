@@ -33,7 +33,7 @@ public class AnswerService {
         Form form = formService.getFormForClientByFormId(formId, clientId);
         List<Answer> answers = answerRepository.findByUserResponse_Form_Id(formId);
 
-        if (form.getStatus() != Status.Completed) {
+        if (form.getStatus() != Status.Paid) {
             throw new RuntimeException("Form is not completed yet");
         }
 

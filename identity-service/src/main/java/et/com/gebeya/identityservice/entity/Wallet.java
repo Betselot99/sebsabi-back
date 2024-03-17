@@ -1,8 +1,9 @@
-package et.com.gebeya.safaricom.coreservice.model;
-import et.com.gebeya.safaricom.coreservice.dto.WalletDto;
+package et.com.gebeya.identityservice.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+
 import java.math.BigDecimal;
 
 @Entity
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Wallet {
     @jakarta.persistence.Id
     @Id
@@ -28,9 +30,5 @@ private Long id;
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    public Wallet(WalletDto walletDto){
-        this.setUserId(walletDto.getUserId());
-        this.setAmount(walletDto.getAmount());
-    }
 
 }

@@ -3,6 +3,7 @@ package et.com.gebeya.safaricom.coreservice.controller;
 
 import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentDto;
 import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.TransferPaymentResponseDto;
+import et.com.gebeya.safaricom.coreservice.dto.PaymentDto.WalletCheckDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.FormSearchRequestDto;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.GigWorkerRequest;
 import et.com.gebeya.safaricom.coreservice.dto.requestDto.ProposalDto;
@@ -69,13 +70,13 @@ public class GigWorkerController {
         Object userId = auth.getPrincipal(); // Get user ID
         return gigWorkerService.updateGigworker(Long.valueOf((Integer)userId), gigWorkerRequest);
     }
-    @GetMapping("/search")
+    @GetMapping("/search/form")
     public ResponseEntity<Page<Form>> searchForms(
             @RequestParam Map<String, String> requestParams,
             @PageableDefault(size = 10) Pageable pageable
     ) {
         FormSearchRequestDto searchRequestDto = new FormSearchRequestDto(requestParams);
-        Page<Form> forms = formService.searchForms(searchRequestDto, pageable);
+        Page<Form> forms = formService.searchFormPosted(searchRequestDto, pageable);
         return new ResponseEntity<>(forms, HttpStatus.OK);
     }
 
@@ -144,12 +145,10 @@ public class GigWorkerController {
     }
 
     @GetMapping("/check/balance")
-    public ResponseEntity<TransferPaymentResponseDto> checkBalanceForGigWoker(@RequestParam Long gigWorkerId) throws AccessDeniedException {
+    public ResponseEntity<WalletCheckDto> checkBalanceForGigWoker() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
-        TransferPaymentResponseDto transferPaymentDto = new TransferPaymentResponseDto();
-        transferPaymentDto.setGigWorkerId(Long.valueOf((Integer) userId));
-        TransferPaymentResponseDto responseDto = paymentService.checkBalanceForGigWorker(Long.valueOf((Integer)userId));
+        WalletCheckDto responseDto = walletService.getGigworkerWallet(Long.valueOf((Integer)userId));
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
 
     }
@@ -157,7 +156,7 @@ public class GigWorkerController {
     public ResponseEntity<Wallet> addMoneyToWallet(@RequestParam BigDecimal amount) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
-        Wallet wallet = walletService.addMoneyToWallet(Long.valueOf((Integer)userId),amount);
+        Wallet wallet = walletService.addMoneyToGigworkerWallet(Long.valueOf((Integer)userId),amount);
         return new ResponseEntity<>(wallet, HttpStatus.OK);
     }
 

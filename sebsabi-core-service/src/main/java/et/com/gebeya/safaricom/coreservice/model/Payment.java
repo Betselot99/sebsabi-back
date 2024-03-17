@@ -33,6 +33,7 @@ public class Payment {
     private GigWorker gigWorker;
 //    @GeneratedValue(strategy = GenerationType.AUTO)
     private String transactionNumber;
+    private BigDecimal adminCommission;
 //payment status, transaction Number, Paid amount
     public Payment(TransferPaymentResponseDto paymentDto){
 

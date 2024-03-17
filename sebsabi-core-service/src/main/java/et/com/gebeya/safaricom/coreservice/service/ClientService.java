@@ -36,10 +36,10 @@ import java.util.Optional;
 public class ClientService {
     private final ClientRepository clientRepository;
     private final WalletService walletService;
+    private final KafkaTemplate<String, CreationEvent> kafkaTemplate;
 
     private final WebClient.Builder webClientBuilder;
 
-    private final KafkaTemplate<String, CreationEvent> kafkaTemplate;
     @Transactional
     public String createClients(ClientRequest clientRequest) {
         Client client = new Client(clientRequest);
@@ -53,16 +53,16 @@ public class ClientService {
         log.info("Client {} is Created and saved", client.getFirstName());
         //clientRepository.save(client);
         String fullName = client.getFirstName() + " " + client.getLastName();
-
         kafkaTemplate.send("CreateUser",new CreationEvent(client.getEmail(),fullName));
+
         return "Client  Signed up Successfully ";
     }
 
     private void createWallet(Client client) {
         Wallet wallet=new Wallet();
-        wallet.setUserId(client.getId());
-        wallet.setAmount(new BigDecimal(0));
-
+        wallet.setClientId(client.getId());
+        wallet.setAmount(new BigDecimal(20000));
+        walletService.createNewWallet(wallet);
     }
 
 

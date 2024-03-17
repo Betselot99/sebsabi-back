@@ -1,6 +1,7 @@
 package et.com.gebeya.safaricom.coreservice.repository.specification;
 
 import et.com.gebeya.safaricom.coreservice.model.Form;
+import et.com.gebeya.safaricom.coreservice.model.enums.Status;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
@@ -18,5 +19,8 @@ public class FormSpecifications {
 
     public static Specification<Form> formByClientId(Long clientId) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("client").get("id"), clientId);
+    }
+    public static Specification<Form> formByStatus(Status status) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), status);
     }
 }

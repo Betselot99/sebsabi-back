@@ -1,5 +1,6 @@
 package et.com.gebeya.safaricom.coreservice.controller;
 
+import et.com.gebeya.safaricom.coreservice.dto.WalletDto;
 import et.com.gebeya.safaricom.coreservice.model.Wallet;
 import et.com.gebeya.safaricom.coreservice.service.WalletService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,9 @@ public class WalletController {
     private final WalletService walletService;
 
     @PostMapping("/add-money")
-    public ResponseEntity<Wallet> addMoneyToWallet(@RequestParam Long userId, @RequestParam BigDecimal amount) {
-        Wallet wallet = walletService.addMoneyToWallet(userId,amount);
-        return new ResponseEntity<>(wallet, HttpStatus.OK);
+    public ResponseEntity<Wallet> addMoneyToWallet(@RequestBody WalletDto walletDto) {
+        Wallet wallet=new Wallet(walletDto);
+        Wallet wallets = walletService.createNewWallet(wallet);
+        return new ResponseEntity<>(wallets, HttpStatus.OK);
     }
 }
