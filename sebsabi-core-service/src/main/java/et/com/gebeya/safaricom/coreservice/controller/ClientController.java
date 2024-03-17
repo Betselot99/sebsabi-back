@@ -258,8 +258,8 @@ public class ClientController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
         TransferPaymentDto transferPaymentDto = new TransferPaymentDto();
-        transferPaymentDto.setClientId(Long.valueOf((Integer) userId));
         transferPaymentDto.setAdminId(0);
+        transferPaymentDto.setClientId(Long.valueOf((Integer) userId));
         TransferPaymentResponseDto response = paymentService.transferPaymentFromClientToAdmin(transferPaymentDto, formId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

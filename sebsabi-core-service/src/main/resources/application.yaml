@@ -1,9 +1,0 @@
-
-paths:
-# Your API paths here
-components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT

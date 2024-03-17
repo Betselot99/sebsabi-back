@@ -70,13 +70,13 @@ public class GigWorkerController {
         Object userId = auth.getPrincipal(); // Get user ID
         return gigWorkerService.updateGigworker(Long.valueOf((Integer)userId), gigWorkerRequest);
     }
-    @GetMapping("/search")
+    @GetMapping("/search/form")
     public ResponseEntity<Page<Form>> searchForms(
             @RequestParam Map<String, String> requestParams,
             @PageableDefault(size = 10) Pageable pageable
     ) {
         FormSearchRequestDto searchRequestDto = new FormSearchRequestDto(requestParams);
-        Page<Form> forms = formService.searchForms(searchRequestDto, pageable);
+        Page<Form> forms = formService.searchFormPosted(searchRequestDto, pageable);
         return new ResponseEntity<>(forms, HttpStatus.OK);
     }
 

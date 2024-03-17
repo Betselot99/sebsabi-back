@@ -58,6 +58,7 @@ public class AdministratorController {
         }
         throw new RuntimeException("Your not authorized to make other changes");
     }
+
     @GetMapping("/search")
     public ResponseEntity<Page<Form>> searchForms(
             @RequestParam Map<String, String> requestParams,

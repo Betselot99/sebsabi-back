@@ -23,19 +23,25 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.math.BigDecimal;
+
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class AuthConfig {
 
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserCredentialsService usersService;
+    private final WalletService walletService;
 
-    public AuthConfig(JwtAuthFilter jwtAuthFilter, UserCredentialsService usersService) {
+
+    public AuthConfig(JwtAuthFilter jwtAuthFilter, UserCredentialsService usersService, WalletService walletService) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.usersService = usersService;
+        this.walletService = walletService;
     }
 
     @Bean

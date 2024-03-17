@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -29,7 +30,9 @@ public class PaymentService {
     private final FormService formService;
     private final ProposalService proposalService;
     private final FormRepository formRepository;
+    private final ClientService clientService;
     private final WalletRepository walletRepository;
+    private final GigWorkerService gigWorkerService;
     @Transactional
     public TransferPaymentResponseDto transferPaymentFromClientToAdmin(TransferPaymentDto transferPaymentDto, Long formId) throws AccessDeniedException {
         Form form = formService.getFormForClientByFormId(formId, transferPaymentDto.getClientId());
@@ -138,13 +141,6 @@ public class PaymentService {
         }
     }
 
-    public TransferPaymentResponseDto checkBalanceForGigWorker(Long userId) {
-        Wallet wallet = walletRepository.findByUserId(userId);
-        TransferPaymentResponseDto responseDto = new TransferPaymentResponseDto();
-        responseDto.setAmountTransferred(wallet.getAmount());
-        responseDto.setMessage("Balance checked successfully.");
-        return responseDto;
-    }
 
 
     private Payment getUser(String id){

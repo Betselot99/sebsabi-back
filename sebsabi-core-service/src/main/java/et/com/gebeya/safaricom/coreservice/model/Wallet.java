@@ -1,4 +1,5 @@
 package et.com.gebeya.safaricom.coreservice.model;
+import et.com.gebeya.safaricom.coreservice.dto.WalletDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.Id;
