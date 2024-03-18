@@ -57,7 +57,7 @@ public class ProposalService {
         formRepository.save(form);
 
     }
-    public List<FormGigworkerDto> findFormsByGigWorkerId(Long gigWorkerId) {
+    public List<Form> findFormsByGigWorkerId(Long gigWorkerId) {
         List<Proposal> proposals = proposalRepository.findByGigWorkerId(gigWorkerId);
 
         // Extract forms from proposals where form status is not "CLAIMED"
@@ -66,7 +66,7 @@ public class ProposalService {
                 .filter(proposal -> proposal.getGigWorker().getId().equals(gigWorkerId))
                 .map(proposal -> {
                     Form form = proposal.getForm();
-                    return FormGigworkerDto.builder()
+                    return Form.builder()
                             .id(form.getId())
                             .title(form.getTitle())
                             .description(form.getDescription())

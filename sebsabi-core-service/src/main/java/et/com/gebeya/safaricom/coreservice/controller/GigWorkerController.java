@@ -99,11 +99,11 @@ public class GigWorkerController {
     @GetMapping("/view/forms/applied")
     @ResponseStatus(HttpStatus.OK)
     public List<Form> getAllFormByApplied() {
-        Status status = Status.Claimed; // Set the status to "Applied"
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Object userId = auth.getPrincipal();
-        return formService.getFormsByGigWorkerIdAndStatus(Long.valueOf((Integer)userId),status);
+        return proposalService.findFormsByGigWorkerId(Long.valueOf((Integer)userId));
     }
+    
     @GetMapping("/view/forms/completed")
     @ResponseStatus(HttpStatus.OK)
     public List<Form> getAllFormByCompleted() {

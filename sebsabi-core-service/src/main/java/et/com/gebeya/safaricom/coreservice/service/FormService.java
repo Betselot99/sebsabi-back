@@ -218,7 +218,7 @@ public class FormService {
         if (createdOn != null) {
             spec = spec.and(FormSpecifications.formByCreatedOn(createdOn));
         }
-        spec = spec.and(FormSpecifications.formByStatus(Status.Posted));
+        // spec = spec.and(FormSpecifications.formByStatus(Status.Posted));
         return formRepository.findAll(spec, pageable);
     }
     public Page<Form> searchFormPosted(FormSearchRequestDto searchRequestDto, Pageable pageable) {
