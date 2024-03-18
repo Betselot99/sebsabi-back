@@ -28,7 +28,7 @@ public class EmailService {
             helper.setText("Dear " + fullname + ",\n\n"
                     + "We are thrilled to welcome you to the Sebsabi System, your comprehensive platform for efficient data collection and gig economy management. As a valued member of our community, you now have access to a range of powerful tools and features designed to streamline your workflows and enhance your productivity.\n\n"
                     + "To get started, simply click on the following link to log in to your account:\n"
-                    + "[Login to Your Account](http://localhost:8080/auth/login)\n\n"
+                    + "[Login to Your Account](https://sebsabi.b.gebeyalearning.com)\n\n"
                     + "Once logged in, you'll be able to post questionnaires, visualize completed jobs, communicate with service providers, process payments through Mpesa, generate reports, vet gig workers, and manage your profile effortlessly.\n\n"
                     + "Should you have any questions or require assistance at any point, our dedicated support team is here to help. Feel free to reach out to us at [support@sebsabi.com](mailto:support@sebsabi.com) and we'll be more than happy to assist you.\n\n"
                     + "Thank you for choosing Sebsabi System. We look forward to empowering you with meaningful insights and a significant competitive edge.\n\n"
