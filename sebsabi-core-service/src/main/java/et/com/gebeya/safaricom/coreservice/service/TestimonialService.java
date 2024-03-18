@@ -25,7 +25,7 @@ public class TestimonialService {
         GigWorker gigWorker = gigWorkerService.getGigWorkerByIdg(gigWorkerId);
         Form form=formService.getFormForGigWorkerAndClient(formId,client.getId(),gigWorker.getId());
         if(form !=null){
-            if(form.getStatus() == Status.Completed){
+            if(form.getStatus() == Status.Paid){
             Testimonial testimonial = new Testimonial();
             testimonial.setContent(content);
             testimonial.setClient(client);
